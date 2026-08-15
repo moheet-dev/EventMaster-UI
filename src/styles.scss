@@ -1,1 +1,104 @@
-/* You can add global styles to this file, and also import other style files */
+/* ============================================================
+   EventMaster — Global Styles
+   ============================================================ */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+/* ── Design Tokens ── */
+:root {
+  --color-1: #0d0d0d;   /* True Black */
+  --color-2: #1a1a2e;   /* Dark surface */
+  --color-3: #16213e;   /* Midnight Blue */
+  --color-4: #0f3460;   /* Deep Blue */
+  --color-5: #e94560;   /* Indian Red accent */
+
+  --text-primary: #f0f0f0;
+  --text-secondary: #a0a8c0;
+  --text-muted: #606880;
+
+  --border-subtle: rgba(255, 255, 255, 0.07);
+  --border-focus: rgba(233, 69, 96, 0.5);
+
+  --glass-bg: rgba(22, 33, 62, 0.6);
+  --glass-blur: blur(20px);
+
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 22px;
+  --radius-xl: 32px;
+
+  --transition-fast: 0.15s ease;
+  --transition-base: 0.25s ease;
+  --transition-slow: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+
+  --shadow-card: 0 24px 60px rgba(0, 0, 0, 0.6), 0 4px 16px rgba(233, 69, 96, 0.08);
+  --shadow-glow: 0 0 40px rgba(233, 69, 96, 0.2);
+}
+
+/* ── Global Reset ── */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  background-color: var(--color-1);
+  color: var(--text-primary);
+  line-height: 1.6;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ── Typography ── */
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--text-primary);
+}
+
+a {
+  color: var(--color-5);
+  text-decoration: none;
+  transition: color var(--transition-fast), opacity var(--transition-fast);
+
+  &:hover {
+    color: #ff6b85;
+    opacity: 0.9;
+  }
+}
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-2);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-4);
+  border-radius: 99px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-5);
+}
+
+/* ── Utility ── */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}

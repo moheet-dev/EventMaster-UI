@@ -1,0 +1,52 @@
+<main class="home-page" aria-label="Home page">
+  <div class="bg-orb bg-orb--1" aria-hidden="true"></div>
+  <div class="bg-orb bg-orb--2" aria-hidden="true"></div>
+
+  <header class="navbar">
+    <div class="brand">
+      <svg width="30" height="30" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <rect width="32" height="32" rx="10" fill="#E94560"/>
+        <path d="M8 16L14 22L24 10" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <span class="brand__name">EventMaster</span>
+    </div>
+    <button class="btn-logout" (click)="logout()" id="home-logout">
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
+        <path d="M7 3H3a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        <path d="M12 12l3-3-3-3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M15 9H7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+      </svg>
+      Logout
+    </button>
+  </header>
+
+  <section class="hero" aria-labelledby="home-heading">
+    <div class="hero__badge">🎉 Welcome to EventMaster</div>
+    <h1 class="hero__title" id="home-heading">
+      Your Next Great<br />
+      <span class="hero__title--accent">Experience Awaits</span>
+    </h1>
+    <p class="hero__subtitle">
+      Discover thousands of events near you — concerts, sports, conferences, and more.
+      Your tickets are just a click away.
+    </p>
+    <div class="hero__actions">
+      <button class="btn-primary" id="home-explore">Explore Events</button>
+      <button class="btn-secondary" id="home-browse">Browse Categories</button>
+    </div>
+  </section>
+
+  <!-- Placeholder cards -->
+  <section class="coming-soon" aria-label="Coming soon">
+    <p class="coming-soon__label">More features coming soon&hellip;</p>
+    <div class="coming-soon__grid">
+      @for (card of featureCards; track card.title) {
+        <div class="feature-card">
+          <span class="feature-card__icon" aria-hidden="true">{{ card.icon }}</span>
+          <h3 class="feature-card__title">{{ card.title }}</h3>
+          <p class="feature-card__desc">{{ card.desc }}</p>
+        </div>
+      }
+    </div>
+  </section>
+</main>

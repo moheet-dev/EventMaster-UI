@@ -1,0 +1,137 @@
+<section class="auth-page" aria-label="Login page">
+  <!-- Background particles -->
+  <div class="bg-orb bg-orb--1" aria-hidden="true"></div>
+  <div class="bg-orb bg-orb--2" aria-hidden="true"></div>
+  <div class="bg-orb bg-orb--3" aria-hidden="true"></div>
+
+  <div class="auth-card">
+    <!-- Brand -->
+    <div class="brand">
+      <div class="brand__icon" aria-hidden="true">
+        <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect width="32" height="32" rx="10" fill="#E94560"/>
+          <path d="M8 16L14 22L24 10" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <span class="brand__name">EventMaster</span>
+    </div>
+
+    <h1 class="auth-title">Welcome back</h1>
+    <p class="auth-subtitle">Sign in to your account to continue</p>
+
+    <!-- Error message -->
+    @if (errorMessage()) {
+      <div class="error-alert" role="alert" id="login-error">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+          <circle cx="8" cy="8" r="7" stroke="#E94560" stroke-width="1.5"/>
+          <path d="M8 5v4M8 11v.5" stroke="#E94560" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+        {{ errorMessage() }}
+      </div>
+    }
+
+    <!-- Form -->
+    <form
+      [formGroup]="loginForm"
+      (ngSubmit)="onSubmit()"
+      novalidate
+      id="login-form"
+      aria-label="Login form"
+    >
+      <!-- Identifier field -->
+      <div class="form-field" [class.form-field--error]="identifierCtrl.invalid && identifierCtrl.touched">
+        <label class="form-label" for="login-identifier">Email or Username</label>
+        <div class="input-wrapper">
+          <svg class="input-icon" width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
+            <circle cx="9" cy="6" r="3" stroke="currentColor" stroke-width="1.5"/>
+            <path d="M3 15c0-3.314 2.686-6 6-6s6 2.686 6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+          <input
+            id="login-identifier"
+            class="form-input"
+            type="text"
+            formControlName="identifier"
+            placeholder="Enter email or username"
+            autocomplete="username"
+            [attr.aria-invalid]="identifierCtrl.invalid && identifierCtrl.touched"
+            aria-describedby="login-identifier-error"
+          />
+        </div>
+        @if (identifierCtrl.invalid && identifierCtrl.touched) {
+          <span class="field-error" id="login-identifier-error" role="alert">
+            Email or username is required
+          </span>
+        }
+      </div>
+
+      <!-- Password field -->
+      <div class="form-field" [class.form-field--error]="passwordCtrl.invalid && passwordCtrl.touched">
+        <label class="form-label" for="login-password">Password</label>
+        <div class="input-wrapper">
+          <svg class="input-icon" width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
+            <rect x="3" y="8" width="12" height="8" rx="2" stroke="currentColor" stroke-width="1.5"/>
+            <path d="M6 8V6a3 3 0 0 1 6 0v2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+          <input
+            id="login-password"
+            class="form-input form-input--padded-right"
+            [type]="showPassword() ? 'text' : 'password'"
+            formControlName="password"
+            placeholder="Enter your password"
+            autocomplete="current-password"
+            [attr.aria-invalid]="passwordCtrl.invalid && passwordCtrl.touched"
+            aria-describedby="login-password-error"
+          />
+          <button
+            type="button"
+            class="toggle-password"
+            (click)="togglePassword()"
+            [attr.aria-label]="showPassword() ? 'Hide password' : 'Show password'"
+            id="login-toggle-password"
+          >
+            @if (showPassword()) {
+              <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
+                <path d="M2 9s2.5-5 7-5 7 5 7 5-2.5 5-7 5-7-5-7-5Z" stroke="currentColor" stroke-width="1.5"/>
+                <circle cx="9" cy="9" r="2" stroke="currentColor" stroke-width="1.5"/>
+                <path d="M3 3l12 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+              </svg>
+            } @else {
+              <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
+                <path d="M2 9s2.5-5 7-5 7 5 7 5-2.5 5-7 5-7-5-7-5Z" stroke="currentColor" stroke-width="1.5"/>
+                <circle cx="9" cy="9" r="2" stroke="currentColor" stroke-width="1.5"/>
+              </svg>
+            }
+          </button>
+        </div>
+        @if (passwordCtrl.invalid && passwordCtrl.touched) {
+          <span class="field-error" id="login-password-error" role="alert">
+            @if (passwordCtrl.errors?.['required']) { Password is required }
+            @else if (passwordCtrl.errors?.['minlength']) { Password must be at least 6 characters }
+          </span>
+        }
+      </div>
+
+      <!-- Submit -->
+      <button
+        type="submit"
+        class="btn-primary"
+        id="login-submit"
+        [disabled]="isLoading()"
+        [class.btn-primary--loading]="isLoading()"
+        aria-live="polite"
+      >
+        @if (isLoading()) {
+          <span class="spinner" aria-hidden="true"></span>
+          Signing in…
+        } @else {
+          Sign In
+        }
+      </button>
+    </form>
+
+    <p class="auth-switch">
+      Don't have an account?
+      <a routerLink="/register" id="login-goto-register">Create one</a>
+    </p>
+  </div>
+</section>
