@@ -1,52 +1,320 @@
-<main class="home-page" aria-label="Home page">
+<main class="dashboard" aria-label="Events Dashboard">
+  <!-- Background orbs -->
   <div class="bg-orb bg-orb--1" aria-hidden="true"></div>
   <div class="bg-orb bg-orb--2" aria-hidden="true"></div>
 
-  <header class="navbar">
+  <!-- ═══════════════════ NAVBAR ═══════════════════ -->
+  <header class="navbar" role="banner">
     <div class="brand">
-      <svg width="30" height="30" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-        <rect width="32" height="32" rx="10" fill="#E94560"/>
-        <path d="M8 16L14 22L24 10" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+      <svg width="30" height="30" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+        <rect width="32" height="32" rx="10" fill="#E94560" />
+        <path d="M8 16L14 22L24 10" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
       </svg>
       <span class="brand__name">EventMaster</span>
     </div>
-    <button class="btn-logout" (click)="logout()" id="home-logout">
-      <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
-        <path d="M7 3H3a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-        <path d="M12 12l3-3-3-3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-        <path d="M15 9H7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-      </svg>
-      Logout
-    </button>
+
+    <nav class="navbar__actions" aria-label="Main navigation">
+      <button class="btn-outline" id="nav-venues" (click)="toggleVenuesPanel()"
+        [class.btn-outline--active]="showVenuesPanel()" aria-haspopup="true" [attr.aria-expanded]="showVenuesPanel()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M3 21V8l9-6 9 6v13" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
+            stroke-linejoin="round" />
+          <path d="M9 21V14h6v7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
+            stroke-linejoin="round" />
+        </svg>
+        Venues
+      </button>
+
+      <button class="btn-accent" id="nav-new-event" (click)="openCreateEvent()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" />
+        </svg>
+        New Event
+      </button>
+
+      <button class="btn-logout" id="nav-logout" (click)="logout()" aria-label="Logout">
+        <svg width="17" height="17" viewBox="0 0 18 18" fill="none" aria-hidden="true">
+          <path d="M7 3H3a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h4" stroke="currentColor" stroke-width="1.5"
+            stroke-linecap="round" />
+          <path d="M12 12l3-3-3-3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
+            stroke-linejoin="round" />
+          <path d="M15 9H7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+        </svg>
+        Logout
+      </button>
+    </nav>
   </header>
 
-  <section class="hero" aria-labelledby="home-heading">
-    <div class="hero__badge">🎉 Welcome to EventMaster</div>
-    <h1 class="hero__title" id="home-heading">
-      Your Next Great<br />
-      <span class="hero__title--accent">Experience Awaits</span>
-    </h1>
-    <p class="hero__subtitle">
-      Discover thousands of events near you — concerts, sports, conferences, and more.
-      Your tickets are just a click away.
-    </p>
-    <div class="hero__actions">
-      <button class="btn-primary" id="home-explore">Explore Events</button>
-      <button class="btn-secondary" id="home-browse">Browse Categories</button>
-    </div>
-  </section>
+  <!-- ═══════════════════ CONTENT ═══════════════════ -->
+  <div class="content-wrap">
 
-  <!-- Placeholder cards -->
-  <section class="coming-soon" aria-label="Coming soon">
-    <p class="coming-soon__label">More features coming soon&hellip;</p>
-    <div class="coming-soon__grid">
-      @for (card of featureCards; track card.title) {
-        <div class="feature-card">
-          <span class="feature-card__icon" aria-hidden="true">{{ card.icon }}</span>
-          <h3 class="feature-card__title">{{ card.title }}</h3>
-          <p class="feature-card__desc">{{ card.desc }}</p>
-        </div>
+    <!-- ── Page Title ── -->
+    <div class="page-header">
+      <div>
+        <h1 class="page-header__title" id="dashboard-heading">Events</h1>
+        <p class="page-header__sub">
+          @if (pagination()) {
+          {{ pagination()!.total }} event{{ pagination()!.total !== 1 ? 's' : '' }} found
+          }
+        </p>
+      </div>
+    </div>
+
+    <!-- ── Filter Bar ── -->
+    <div class="filter-bar" role="search" aria-label="Filter events">
+      <!-- Name search -->
+      <div class="filter-bar__group filter-bar__group--search">
+        <svg class="filter-bar__icon" width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <circle cx="11" cy="11" r="8" stroke="currentColor" stroke-width="1.8" />
+          <path d="M21 21l-4.35-4.35" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+        </svg>
+        <input id="filter-name" class="filter-bar__input" type="search" placeholder="Search events…"
+          [value]="nameSearch" (input)="onNameSearchChange($any($event.target).value)"
+          aria-label="Search events by name" />
+      </div>
+
+      <!-- Venue dropdown -->
+      <div class="filter-bar__group">
+        <svg class="filter-bar__icon" width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M3 21V8l9-6 9 6v13" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
+            stroke-linejoin="round" />
+        </svg>
+        <select id="filter-venue" class="filter-bar__select" [(ngModel)]="venueFilter" (change)="onVenueFilterChange()"
+          aria-label="Filter by venue">
+          <option [ngValue]="null">All venues</option>
+          @for (v of venues(); track v.id) {
+          <option [ngValue]="v.id">{{ v.name }}</option>
+          }
+        </select>
+      </div>
+
+      <!-- From Date -->
+      <div class="filter-bar__group filter-bar__group--date">
+        <svg class="filter-bar__icon" width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <rect x="3" y="4" width="18" height="18" rx="2" stroke="currentColor" stroke-width="1.8" />
+          <path d="M16 2v4M8 2v4M3 10h18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+        </svg>
+        <input
+          id="filter-from-date"
+          class="filter-bar__input filter-bar__input--date"
+          type="date"
+          [(ngModel)]="fromDate"
+          (change)="onDateFilterChange()"
+          aria-label="From date"
+        />
+      </div>
+
+      <!-- To Date -->
+      <div class="filter-bar__group filter-bar__group--date">
+        <svg class="filter-bar__icon" width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <rect x="3" y="4" width="18" height="18" rx="2" stroke="currentColor" stroke-width="1.8" />
+          <path d="M16 2v4M8 2v4M3 10h18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+        </svg>
+        <input
+          id="filter-to-date"
+          class="filter-bar__input filter-bar__input--date"
+          type="date"
+          [(ngModel)]="toDate"
+          (change)="onDateFilterChange()"
+          aria-label="To date"
+        />
+      </div>
+
+      <!-- Clear -->
+      @if (hasActiveFilters) {
+      <button class="filter-bar__clear" (click)="clearFilters()" id="filter-clear" aria-label="Clear filters">
+        <svg width="14" height="14" viewBox="0 0 18 18" fill="none" aria-hidden="true">
+          <path d="M4 4l10 10M14 4L4 14" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+        </svg>
+        Clear
+      </button>
       }
     </div>
-  </section>
+
+    <!-- ── Events Grid ── -->
+    @if (loadingEvents()) {
+    <!-- Skeleton loader -->
+    <div class="events-grid" aria-label="Loading events" aria-busy="true">
+      @for (sk of [1,2,3,4,5,6]; track sk) {
+      <div class="event-card event-card--skeleton">
+        <div class="sk-img"></div>
+        <div class="sk-body">
+          <div class="sk-line sk-line--title"></div>
+          <div class="sk-line sk-line--sub"></div>
+          <div class="sk-line sk-line--sub sk-line--short"></div>
+        </div>
+      </div>
+      }
+    </div>
+    } @else if (apiError()) {
+    <div class="empty-state" role="alert">
+      <span class="empty-state__icon" aria-hidden="true">⚠️</span>
+      <p class="empty-state__text">{{ apiError() }}</p>
+      <button class="btn-accent" (click)="loadEvents()" id="retry-events">Retry</button>
+    </div>
+    } @else if (events().length === 0) {
+    <div class="empty-state">
+      <span class="empty-state__icon" aria-hidden="true">🎭</span>
+      <p class="empty-state__text">No events found.</p>
+      <button class="btn-accent" (click)="openCreateEvent()" id="empty-create-event">Create the first event</button>
+    </div>
+    } @else {
+    <div class="events-grid" aria-label="Events list">
+      @for (ev of events(); track ev.id) {
+      <article class="event-card" tabindex="0">
+        <!-- Image -->
+        <div class="event-card__image-wrap">
+          @if (ev.display_image) {
+          <img [src]="ev.display_image" [alt]="ev.name" class="event-card__img" loading="lazy" />
+          } @else {
+          <div class="event-card__img-placeholder" aria-hidden="true">🎉</div>
+          }
+          @if (isOwner(ev.created_by)) {
+          <button class="event-card__edit" (click)="openEditEvent(ev)" [id]="'edit-event-' + ev.id"
+            aria-label="Edit event" title="Edit event">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" stroke="currentColor"
+                stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+              <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+          </button>
+          }
+        </div>
+
+        <!-- Info -->
+        <div class="event-card__body">
+          <h3 class="event-card__name">{{ ev.name }}</h3>
+          <p class="event-card__desc">{{ ev.description }}</p>
+
+          <div class="event-card__meta">
+            <span class="meta-chip meta-chip--venue">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M3 21V8l9-6 9 6v13" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                  stroke-linejoin="round" />
+              </svg>
+              {{ getVenueName(ev.venue_id) }}
+            </span>
+            <span class="meta-chip">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <rect x="3" y="4" width="18" height="18" rx="2" stroke="currentColor" stroke-width="1.8" />
+                <path d="M16 2v4M8 2v4M3 10h18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+              </svg>
+              {{ formatDate(ev.event_on) }}
+            </span>
+          </div>
+        </div>
+      </article>
+      }
+    </div>
+
+    <!-- ── Pagination ── -->
+    @if (totalPages() > 1) {
+    <nav class="pagination" aria-label="Pagination">
+      <button class="pagination__btn" id="pg-prev" (click)="prevPage()" [disabled]="currentPage() === 1"
+        aria-label="Previous page">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+            stroke-linejoin="round" />
+        </svg>
+      </button>
+
+      @for (pg of pageNumbers(); track $index) {
+      @if (pg === '…') {
+      <span class="pagination__ellipsis" aria-hidden="true">…</span>
+      } @else {
+      <button class="pagination__btn" [class.pagination__btn--active]="pg === currentPage()" (click)="goToPage(pg)"
+        [id]="'pg-' + pg" [attr.aria-label]="'Page ' + pg" [attr.aria-current]="pg === currentPage() ? 'page' : null">{{
+        pg }}</button>
+      }
+      }
+
+      <button class="pagination__btn" id="pg-next" (click)="nextPage()" [disabled]="currentPage() === totalPages()"
+        aria-label="Next page">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M9 18l6-6-6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+            stroke-linejoin="round" />
+        </svg>
+      </button>
+    </nav>
+    }
+    }
+  </div>
+
+  <!-- ═══════════════════ VENUES PANEL ═══════════════════ -->
+  @if (showVenuesPanel()) {
+  <div class="venues-backdrop" (click)="toggleVenuesPanel()" role="presentation" aria-hidden="true"></div>
+  <aside class="venues-panel" role="complementary" aria-label="Venues panel">
+    <div class="venues-panel__header">
+      <h2 class="venues-panel__title">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M3 21V8l9-6 9 6v13" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+            stroke-linejoin="round" />
+          <path d="M9 21V14h6v7" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+            stroke-linejoin="round" />
+        </svg>
+        Venues
+      </h2>
+      <button class="venues-panel__close" (click)="toggleVenuesPanel()" aria-label="Close venues panel"
+        id="venues-panel-close">
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
+          <path d="M4 4l10 10M14 4L4 14" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+        </svg>
+      </button>
+    </div>
+
+    <button class="venues-panel__add" (click)="openCreateVenue()" id="create-venue-btn">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" />
+      </svg>
+      New Venue
+    </button>
+
+    @if (loadingVenues()) {
+    <div class="venues-panel__loading" aria-label="Loading venues" aria-busy="true">
+      <span class="spinner" aria-hidden="true"></span>
+    </div>
+    } @else if (venues().length === 0) {
+    <p class="venues-panel__empty">No venues yet. Create one!</p>
+    } @else {
+    <ul class="venue-list" role="list">
+      @for (v of venues(); track v.id) {
+      <li class="venue-item" role="listitem">
+        <div class="venue-item__img-wrap">
+          @if (v.display_image) {
+          <img [src]="v.display_image" [alt]="v.name" class="venue-item__img" loading="lazy" />
+          } @else {
+          <span class="venue-item__img-placeholder" aria-hidden="true">🏛️</span>
+          }
+        </div>
+        <div class="venue-item__info">
+          <p class="venue-item__name">{{ v.name }}</p>
+          <p class="venue-item__address">{{ v.address }}</p>
+        </div>
+        @if (isOwner(v.created_by)) {
+        <button class="venue-item__edit" (click)="openEditVenue(v)" [id]="'edit-venue-' + v.id" aria-label="Edit venue"
+          title="Edit">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round" />
+            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </button>
+        }
+      </li>
+      }
+    </ul>
+    }
+  </aside>
+  }
+
+  <!-- ═══════════════════ MODALS ═══════════════════ -->
+  @if (showEventForm()) {
+  <app-event-form [event]="editingEvent()" (saved)="onEventSaved()" (closed)="closeEventForm()" />
+  }
+
+  @if (showVenueForm()) {
+  <app-venue-form [venue]="editingVenue()" (saved)="onVenueSaved()" (closed)="closeVenueForm()" />
+  }
 </main>

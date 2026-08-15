@@ -61,6 +61,20 @@ export class AuthService {
     return this._token();
   }
 
+  /** Decode JWT payload and return the user's numeric id, or null if unavailable. */
+  currentUserId(): number | null {
+    const token = this._token();
+    if (!token) return null;
+    try {
+      const payload = token.split('.')[1];
+      const decoded = JSON.parse(atob(payload));
+      // Try common JWT id claim names
+      return decoded.id ?? decoded.sub ?? decoded.user_id ?? null;
+    } catch {
+      return null;
+    }
+  }
+
   logout(): void {
     localStorage.removeItem(TOKEN_KEY);
     this._token.set(null);

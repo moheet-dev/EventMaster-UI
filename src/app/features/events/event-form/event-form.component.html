@@ -1,0 +1,120 @@
+<!-- Modal backdrop -->
+<div class="modal-backdrop" (click)="close()" role="presentation" aria-hidden="true"></div>
+
+<div class="modal" role="dialog" [attr.aria-label]="isEdit ? 'Edit event' : 'Create event'" aria-modal="true">
+  <!-- Header -->
+  <div class="modal__header">
+    <h2 class="modal__title">
+      <span class="modal__title-icon" aria-hidden="true">🎉</span>
+      {{ isEdit ? 'Edit Event' : 'New Event' }}
+    </h2>
+    <button class="modal__close" type="button" (click)="close()" id="event-form-close" aria-label="Close">
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+        <path d="M4 4l10 10M14 4L4 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+    </button>
+  </div>
+
+  <!-- Body -->
+  <form class="modal__body" (ngSubmit)="submit()" #f="ngForm" novalidate>
+
+    <!-- Name -->
+    <div class="field">
+      <label class="field__label" for="event-name">Event Name *</label>
+      <input
+        id="event-name"
+        class="field__input"
+        type="text"
+        [(ngModel)]="name"
+        name="name"
+        placeholder="e.g. Summer Jazz Festival"
+        autocomplete="off"
+        required
+      />
+    </div>
+
+    <!-- Description -->
+    <div class="field">
+      <label class="field__label" for="event-desc">Description *</label>
+      <textarea
+        id="event-desc"
+        class="field__input field__textarea"
+        [(ngModel)]="description"
+        name="description"
+        placeholder="Describe the event…"
+        rows="4"
+        required
+      ></textarea>
+    </div>
+
+    <!-- Venue -->
+    <div class="field">
+      <label class="field__label" for="event-venue">Venue *</label>
+      @if (loadingVenues()) {
+        <div class="field__skeleton" aria-label="Loading venues"></div>
+      } @else {
+        <select
+          id="event-venue"
+          class="field__input field__select"
+          [(ngModel)]="venue_id"
+          name="venue_id"
+          required
+        >
+          <option [ngValue]="null" disabled selected>Select a venue…</option>
+          @for (v of venues; track v.id) {
+            <option [ngValue]="v.id">{{ v.name }}</option>
+          }
+        </select>
+      }
+    </div>
+
+    <!-- Event Date & Time -->
+    <div class="field">
+      <label class="field__label" for="event-on">Event Date &amp; Time *</label>
+      <div class="field__datetime-wrap">
+        <svg class="field__datetime-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <rect x="3" y="4" width="18" height="18" rx="2" stroke="currentColor" stroke-width="1.8"/>
+          <path d="M16 2v4M8 2v4M3 10h18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+        </svg>
+        <input
+          id="event-on"
+          class="field__input field__input--datetime"
+          type="datetime-local"
+          [(ngModel)]="event_on"
+          name="event_on"
+          required
+        />
+      </div>
+    </div>
+
+    <!-- Display Image -->
+    <div class="field">
+      <label class="field__label">Display Image</label>
+      <app-image-upload
+        [currentUrl]="display_image || null"
+        (imageUrl)="onImageUrl($event)"
+      />
+    </div>
+
+    <!-- Error -->
+    @if (error()) {
+      <p class="form-error" role="alert">{{ error() }}</p>
+    }
+
+    <!-- Actions -->
+    <div class="modal__actions">
+      <button type="button" class="btn-ghost" (click)="close()" id="event-form-cancel">Cancel</button>
+      <button
+        type="submit"
+        class="btn-primary"
+        id="event-form-submit"
+        [disabled]="submitting()"
+      >
+        @if (submitting()) {
+          <span class="spinner-sm" aria-hidden="true"></span>
+        }
+        {{ submitting() ? 'Saving…' : (isEdit ? 'Save Changes' : 'Create Event') }}
+      </button>
+    </div>
+  </form>
+</div>
