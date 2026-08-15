@@ -32,7 +32,7 @@ export class AuthService {
 
   readonly isLoggedIn = computed(() => !!this._token());
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   register(data: RegisterRequest): Observable<AuthResponse> {
     return this.http
@@ -69,7 +69,7 @@ export class AuthService {
       const payload = token.split('.')[1];
       const decoded = JSON.parse(atob(payload));
       // Try common JWT id claim names
-      return decoded.id ?? decoded.sub ?? decoded.user_id ?? null;
+      return Number(decoded.sub) ?? null;
     } catch {
       return null;
     }
