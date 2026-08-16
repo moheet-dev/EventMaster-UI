@@ -1,0 +1,172 @@
+<!-- Backdrop -->
+<div class="modal-backdrop" (click)="close()" role="presentation" aria-hidden="true"></div>
+
+<div class="modal" role="dialog" aria-modal="true" [attr.aria-label]="'Seats — ' + sectionName">
+
+  <!-- Header -->
+  <div class="modal__header">
+    <div class="modal__title-group">
+      <h2 class="modal__title">
+        <span class="modal__title-icon" aria-hidden="true">💺</span>
+        <span class="modal__section-name">{{ sectionName }}</span>
+      </h2>
+      <span class="modal__subtitle">Seat Layout</span>
+    </div>
+    <button class="modal__close" type="button" (click)="close()" id="seat-modal-close" aria-label="Close">
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+        <path d="M4 4l10 10M14 4L4 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+    </button>
+  </div>
+
+  <!-- Body -->
+  <div class="modal__body">
+
+    <!-- Screen indicator -->
+    <div class="screen-bar">
+      <div class="screen-label">SCREEN / STAGE</div>
+    </div>
+
+    <!-- Loading skeleton -->
+    @if (loading()) {
+      <div class="seats-skeleton">
+        @for (r of [1,2,3]; track r) {
+          <div class="skeleton-seat-row">
+            <div class="skeleton-label"></div>
+            @for (s of [1,2,3,4,5]; track s) {
+              <div class="skeleton-seat"></div>
+            }
+          </div>
+        }
+      </div>
+    }
+
+    <!-- Error -->
+    @if (error()) {
+      <p class="form-error" role="alert">{{ error() }}</p>
+    }
+
+    <!-- Seat grid -->
+    @if (!loading() && !error()) {
+      @if (rows().length === 0) {
+        <div class="seats-empty">
+          <span class="seats-empty__icon" aria-hidden="true">🪑</span>
+          <p>No seats yet. Add the first one below.</p>
+        </div>
+      } @else {
+        <div class="seat-grid" role="list" aria-label="Seat layout">
+          @for (row of displayRows(); track row.row_number) {
+            <div class="seat-row" role="listitem" [class.seat-row--empty]="row.isEmpty">
+              <span class="row-label">{{ row.row_number }}</span>
+
+              @if (row.isEmpty) {
+                <!-- Empty row placeholder -->
+                <div class="empty-row-bar">
+                  <span class="empty-row-label">empty row</span>
+                </div>
+              } @else {
+                <div class="seat-cells">
+                  <!-- Left ghost cells for centering -->
+                  @for (g of [].constructor(row.padLeft); track $index) {
+                    <div class="seat-cell seat-cell--ghost" aria-hidden="true"></div>
+                  }
+                  <!-- Real seats -->
+                  @for (code of row.codes; track code) {
+                    <div class="seat-cell" [attr.title]="code" role="img" [attr.aria-label]="'Seat ' + code">
+                      <span class="seat-code">{{ code }}</span>
+                    </div>
+                  }
+                </div>
+              }
+            </div>
+          }
+        </div>
+      }
+    }
+
+
+    <!-- Add Seat form -->
+    @if (isAddingOpen()) {
+      <div class="add-seat-panel">
+        <div class="add-seat-panel__header">
+          <span class="field__label">Add Seat</span>
+        </div>
+        <div class="add-seat-form">
+          <!-- Code input -->
+          <div class="add-seat-field">
+            <label class="field__label" for="seat-code-input">Seat Code</label>
+            <input
+              id="seat-code-input"
+              class="field__input"
+              type="text"
+              [(ngModel)]="newCode"
+              name="newCode"
+              placeholder="e.g. A4"
+              autocomplete="off"
+              (keydown.enter)="confirmAddSeat()"
+              (keydown.escape)="cancelAddSeat()"
+            />
+          </div>
+          <!-- Row dropdown -->
+          <div class="add-seat-field">
+            <label class="field__label" for="seat-row-select">Row</label>
+            <select
+              id="seat-row-select"
+              class="field__input field__select"
+              [(ngModel)]="newRowNumber"
+              name="newRowNumber"
+            >
+              @for (opt of rowOptions(); track opt) {
+                <option [value]="opt">Row {{ opt }}</option>
+              }
+            </select>
+          </div>
+          <!-- Actions -->
+          <div class="add-seat-actions">
+            <button
+              class="btn-ghost"
+              type="button"
+              id="cancel-add-seat-btn"
+              (click)="cancelAddSeat()"
+              [disabled]="savingSeat()"
+            >Cancel</button>
+            <button
+              class="btn-primary"
+              type="button"
+              id="confirm-add-seat-btn"
+              (click)="confirmAddSeat()"
+              [disabled]="savingSeat() || !newCode.trim()"
+            >
+              @if (savingSeat()) {
+                <span class="spinner-sm" aria-hidden="true"></span>
+              }
+              {{ savingSeat() ? 'Adding…' : 'Add Seat' }}
+            </button>
+          </div>
+          @if (addError()) {
+            <p class="form-error" role="alert">{{ addError() }}</p>
+          }
+        </div>
+      </div>
+    }
+
+    <!-- Footer -->
+    <div class="modal__footer">
+      @if (!isAddingOpen()) {
+        <button
+          class="btn-add-section"
+          type="button"
+          id="open-add-seat-btn"
+          (click)="openAddSeat()"
+          [disabled]="loading()"
+        >
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+            <path d="M7 1v12M1 7h12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+          Add Seat
+        </button>
+      }
+      <button class="btn-ghost" type="button" (click)="close()" id="seat-modal-done-btn">Done</button>
+    </div>
+  </div>
+</div>

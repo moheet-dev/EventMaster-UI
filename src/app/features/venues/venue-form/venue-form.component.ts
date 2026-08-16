@@ -11,11 +11,12 @@ import { FormsModule } from '@angular/forms';
 import { VenueService, VenueReq, Venue } from '../../../core/services/venue.service';
 import { SectionService, Section } from '../../../core/services/section.service';
 import { ImageUploadComponent } from '../../../shared/image-upload/image-upload.component';
+import { SeatModalComponent } from '../seat-modal/seat-modal.component';
 
 @Component({
   selector: 'app-venue-form',
   standalone: true,
-  imports: [CommonModule, FormsModule, ImageUploadComponent],
+  imports: [CommonModule, FormsModule, ImageUploadComponent, SeatModalComponent],
   templateUrl: './venue-form.component.html',
   styleUrl: './venue-form.component.scss',
 })
@@ -50,6 +51,14 @@ export class VenueFormComponent implements OnInit {
   /** Bound to the new section name input */
   newSectionName = '';
 
+  /** ── Inline Section Rename ── */
+  editingSectionId = signal<number | null>(null);
+  editingSectionName = '';
+  savingRename = signal(false);
+
+  /** ── Seat Modal ── */
+  seatModalSection = signal<Section | null>(null);
+
   /** Index of the row currently being dragged (-1 = none) */
   private dragIndex = -1;
 
@@ -57,9 +66,13 @@ export class VenueFormComponent implements OnInit {
     return !!this.venue;
   }
 
-  /** Drag is only active when not loading / adding */
+  /** Drag is only active when not loading / adding / editing */
   get isSortable(): boolean {
-    return !this.savingSection() && !this.isAddingSection();
+    return (
+      !this.savingSection() &&
+      !this.isAddingSection() &&
+      this.editingSectionId() === null
+    );
   }
 
   constructor(
@@ -125,6 +138,47 @@ export class VenueFormComponent implements OnInit {
         this.sectionsError.set('Failed to add section. Please try again.');
       },
     });
+  }
+
+  /* ── Inline rename ── */
+  startEditSection(section: Section): void {
+    this.editingSectionId.set(section.id);
+    this.editingSectionName = section.name;
+    this.sectionsError.set(null);
+  }
+
+  cancelEditSection(): void {
+    this.editingSectionId.set(null);
+    this.editingSectionName = '';
+  }
+
+  confirmEditSection(): void {
+    const name = this.editingSectionName.trim();
+    const sectionId = this.editingSectionId();
+    if (!name || sectionId === null || !this.venue) return;
+
+    this.savingRename.set(true);
+    this.sectionSvc.updateSection(this.venue.id, sectionId, name).subscribe({
+      next: () => {
+        this.savingRename.set(false);
+        this.editingSectionId.set(null);
+        this.editingSectionName = '';
+        this.loadSections();
+      },
+      error: () => {
+        this.savingRename.set(false);
+        this.sectionsError.set('Failed to rename section. Please try again.');
+      },
+    });
+  }
+
+  /* ── Seat modal ── */
+  openSeatModal(section: Section): void {
+    this.seatModalSection.set(section);
+  }
+
+  closeSeatModal(): void {
+    this.seatModalSection.set(null);
   }
 
   /* ── Drag-and-drop (native HTML5) ── */

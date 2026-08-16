@@ -58,6 +58,7 @@
                 <th class="col-handle" aria-label="Drag handle"></th>
                 <th class="col-tier">#</th>
                 <th class="col-name">Name</th>
+                <th class="col-actions">Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -96,7 +97,86 @@
                     }
                   </td>
                   <td class="col-tier">{{ section.tier }}</td>
-                  <td class="col-name">{{ section.name }}</td>
+
+                  <!-- Name cell: display or inline-edit -->
+                  @if (editingSectionId() === section.id) {
+                    <td class="col-name add-section-cell" colspan="2">
+                      <input
+                        class="add-section-input"
+                        type="text"
+                        [(ngModel)]="editingSectionName"
+                        name="editingSectionName"
+                        placeholder="Section name…"
+                        autocomplete="off"
+                        [id]="'edit-section-input-' + section.id"
+                        (keydown.enter)="confirmEditSection()"
+                        (keydown.escape)="cancelEditSection()"
+                        autofocus
+                      />
+                      <div class="add-section-actions">
+                        <button
+                          class="btn-icon btn-icon--confirm"
+                          type="button"
+                          (click)="confirmEditSection()"
+                          [disabled]="savingRename() || !editingSectionName.trim()"
+                          [attr.aria-label]="'Save section ' + section.name"
+                        >
+                          @if (savingRename()) {
+                            <span class="spinner-sm" aria-hidden="true"></span>
+                          } @else {
+                            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                              <path d="M2 7l4 4 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                          }
+                        </button>
+                        <button
+                          class="btn-icon btn-icon--cancel"
+                          type="button"
+                          (click)="cancelEditSection()"
+                          [disabled]="savingRename()"
+                          [attr.aria-label]="'Cancel editing ' + section.name"
+                        >
+                          <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                            <path d="M1 1l10 10M11 1L1 11" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                          </svg>
+                        </button>
+                      </div>
+                    </td>
+                  } @else {
+                    <td class="col-name">{{ section.name }}</td>
+                    <td class="col-actions">
+                      <div class="row-actions">
+                        <!-- Edit name -->
+                        <button
+                          class="btn-row-action btn-row-action--edit"
+                          type="button"
+                          (click)="startEditSection(section)"
+                          [disabled]="!isSortable"
+                          [attr.aria-label]="'Rename ' + section.name"
+                          title="Rename section"
+                        >
+                          <svg width="13" height="13" viewBox="0 0 18 18" fill="none">
+                            <path d="M11 3l4 4L5 17H1v-4L11 3z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                          </svg>
+                        </button>
+                        <!-- Seats -->
+                        <button
+                          class="btn-row-action btn-row-action--seats"
+                          type="button"
+                          (click)="openSeatModal(section)"
+                          [attr.aria-label]="'Manage seats for ' + section.name"
+                          title="Edit seats"
+                        >
+                          <svg width="13" height="13" viewBox="0 0 20 20" fill="none">
+                            <rect x="2" y="8" width="16" height="8" rx="2" stroke="currentColor" stroke-width="1.8"/>
+                            <path d="M5 8V6a1 1 0 0 1 1-1h8a1 1 0 0 1 1 1v2" stroke="currentColor" stroke-width="1.8"/>
+                            <path d="M5 16v2M15 16v2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                          </svg>
+                          Seats
+                        </button>
+                      </div>
+                    </td>
+                  }
                 </tr>
               }
 
@@ -155,7 +235,7 @@
               <!-- Empty state -->
               @if (!sections().length && !isAddingSection()) {
                 <tr>
-                  <td colspan="3" class="sections-empty">No sections yet. Add one above.</td>
+                  <td colspan="4" class="sections-empty">No sections yet. Add one above.</td>
                 </tr>
               }
             </tbody>
@@ -234,3 +314,12 @@
   </div>
 </div>
 
+<!-- Seat Modal -->
+@if (seatModalSection()) {
+  <app-seat-modal
+    [venueId]="venue!.id"
+    [sectionId]="seatModalSection()!.id"
+    [sectionName]="seatModalSection()!.name"
+    (closed)="closeSeatModal()"
+  />
+}
