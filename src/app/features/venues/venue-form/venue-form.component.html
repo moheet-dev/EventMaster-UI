@@ -16,65 +16,221 @@
   </div>
 
   <!-- Body -->
-  <form class="modal__body" (ngSubmit)="submit()" #f="ngForm" novalidate>
+  <div class="modal__body">
 
-    <!-- Name -->
-    <div class="field">
-      <label class="field__label" for="venue-name">Venue Name *</label>
-      <input
-        id="venue-name"
-        class="field__input"
-        type="text"
-        [(ngModel)]="name"
-        name="name"
-        placeholder="e.g. The Grand Amphitheatre"
-        autocomplete="off"
-        required
-      />
-    </div>
+    <!-- ── Sections Panel (edit mode only) ── -->
+    @if (isEdit) {
+      <div class="sections-panel">
+        <!-- Panel header row -->
+        <div class="sections-panel__header">
+          <span class="field__label">Sections</span>
+          @if (!isAddingSection()) {
+            <button
+              class="btn-add-section"
+              type="button"
+              id="venue-add-section-btn"
+              (click)="openAddSection()"
+              [disabled]="savingSection()"
+            >
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                <path d="M7 1v12M1 7h12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+              Add Section
+            </button>
+          }
+        </div>
 
-    <!-- Address -->
-    <div class="field">
-      <label class="field__label" for="venue-address">Address *</label>
-      <textarea
-        id="venue-address"
-        class="field__input field__textarea"
-        [(ngModel)]="address"
-        name="address"
-        placeholder="Full venue address…"
-        rows="3"
-        required
-      ></textarea>
-    </div>
+        <!-- Sections table -->
+        @if (loadingSections()) {
+          <div class="sections-skeleton">
+            <div class="skeleton-row"></div>
+            <div class="skeleton-row"></div>
+            <div class="skeleton-row"></div>
+          </div>
+        } @else {
+          <table
+            class="sections-table"
+            (dragover)="$event.preventDefault()"
+            (drop)="onDrop($event)"
+          >
+            <thead>
+              <tr>
+                <th class="col-handle" aria-label="Drag handle"></th>
+                <th class="col-tier">#</th>
+                <th class="col-name">Name</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (section of sections(); track section.id; let i = $index) {
+                <tr
+                  class="section-row"
+                  [class.is-draggable]="isSortable"
+                  [attr.draggable]="isSortable ? true : null"
+                  (dragstart)="onDragStart(i)"
+                  (dragover)="onDragOver(i, $event)"
+                  (dragend)="onDragEnd()"
+                >
+                  <td class="col-handle">
+                    @if (isSortable) {
+                      <span class="drag-handle" aria-hidden="true">
+                        <svg width="12" height="16" viewBox="0 0 12 16" fill="currentColor">
+                          <circle cx="3" cy="3" r="1.5"/>
+                          <circle cx="9" cy="3" r="1.5"/>
+                          <circle cx="3" cy="8" r="1.5"/>
+                          <circle cx="9" cy="8" r="1.5"/>
+                          <circle cx="3" cy="13" r="1.5"/>
+                          <circle cx="9" cy="13" r="1.5"/>
+                        </svg>
+                      </span>
+                    } @else {
+                      <span class="drag-handle drag-handle--disabled" aria-hidden="true">
+                        <svg width="12" height="16" viewBox="0 0 12 16" fill="currentColor">
+                          <circle cx="3" cy="3" r="1.5"/>
+                          <circle cx="9" cy="3" r="1.5"/>
+                          <circle cx="3" cy="8" r="1.5"/>
+                          <circle cx="9" cy="8" r="1.5"/>
+                          <circle cx="3" cy="13" r="1.5"/>
+                          <circle cx="9" cy="13" r="1.5"/>
+                        </svg>
+                      </span>
+                    }
+                  </td>
+                  <td class="col-tier">{{ section.tier }}</td>
+                  <td class="col-name">{{ section.name }}</td>
+                </tr>
+              }
 
-    <!-- Display Image -->
-    <div class="field">
-      <label class="field__label">Display Image</label>
-      <app-image-upload
-        [currentUrl]="display_image || null"
-        (imageUrl)="onImageUrl($event)"
-      />
-    </div>
+              <!-- Add-section inline row -->
+              @if (isAddingSection()) {
+                <tr class="section-row add-section-row">
+                  <td class="col-handle"></td>
+                  <td class="col-tier">{{ sections().length + 1 }}</td>
+                  <td class="col-name add-section-cell">
+                    <input
+                      class="add-section-input"
+                      type="text"
+                      [(ngModel)]="newSectionName"
+                      name="newSectionName"
+                      placeholder="Section name…"
+                      autocomplete="off"
+                      id="new-section-name-input"
+                      (keydown.enter)="confirmAddSection()"
+                      (keydown.escape)="cancelAddSection()"
+                      autofocus
+                    />
+                    <div class="add-section-actions">
+                      <button
+                        class="btn-icon btn-icon--confirm"
+                        type="button"
+                        id="confirm-add-section-btn"
+                        (click)="confirmAddSection()"
+                        [disabled]="savingSection() || !newSectionName.trim()"
+                        aria-label="Confirm add section"
+                      >
+                        @if (savingSection()) {
+                          <span class="spinner-sm" aria-hidden="true"></span>
+                        } @else {
+                          <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                            <path d="M2 7l4 4 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                          </svg>
+                        }
+                      </button>
+                      <button
+                        class="btn-icon btn-icon--cancel"
+                        type="button"
+                        id="cancel-add-section-btn"
+                        (click)="cancelAddSection()"
+                        [disabled]="savingSection()"
+                        aria-label="Cancel add section"
+                      >
+                        <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                          <path d="M1 1l10 10M11 1L1 11" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              }
 
-    <!-- Error -->
-    @if (error()) {
-      <p class="form-error" role="alert">{{ error() }}</p>
+              <!-- Empty state -->
+              @if (!sections().length && !isAddingSection()) {
+                <tr>
+                  <td colspan="3" class="sections-empty">No sections yet. Add one above.</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        }
+
+        <!-- Sections error -->
+        @if (sectionsError()) {
+          <p class="form-error" role="alert">{{ sectionsError() }}</p>
+        }
+      </div>
     }
 
-    <!-- Actions -->
-    <div class="modal__actions">
-      <button type="button" class="btn-ghost" (click)="close()" id="venue-form-cancel">Cancel</button>
-      <button
-        type="submit"
-        class="btn-primary"
-        id="venue-form-submit"
-        [disabled]="submitting()"
-      >
-        @if (submitting()) {
-          <span class="spinner-sm" aria-hidden="true"></span>
-        }
-        {{ submitting() ? 'Saving…' : (isEdit ? 'Save Changes' : 'Create Venue') }}
-      </button>
-    </div>
-  </form>
+    <!-- ── Venue Fields ── -->
+    <form (ngSubmit)="submit()" #f="ngForm" novalidate>
+
+      <!-- Name -->
+      <div class="field">
+        <label class="field__label" for="venue-name">Venue Name *</label>
+        <input
+          id="venue-name"
+          class="field__input"
+          type="text"
+          [(ngModel)]="name"
+          name="name"
+          placeholder="e.g. The Grand Amphitheatre"
+          autocomplete="off"
+          required
+        />
+      </div>
+
+      <!-- Address -->
+      <div class="field" style="margin-top:1.25rem">
+        <label class="field__label" for="venue-address">Address *</label>
+        <textarea
+          id="venue-address"
+          class="field__input field__textarea"
+          [(ngModel)]="address"
+          name="address"
+          placeholder="Full venue address…"
+          rows="3"
+          required
+        ></textarea>
+      </div>
+
+      <!-- Display Image -->
+      <div class="field" style="margin-top:1.25rem">
+        <label class="field__label">Display Image</label>
+        <app-image-upload
+          [currentUrl]="display_image || null"
+          (imageUrl)="onImageUrl($event)"
+        />
+      </div>
+
+      <!-- Error -->
+      @if (error()) {
+        <p class="form-error" role="alert" style="margin-top:1rem">{{ error() }}</p>
+      }
+
+      <!-- Actions -->
+      <div class="modal__actions">
+        <button type="button" class="btn-ghost" (click)="close()" id="venue-form-cancel">Cancel</button>
+        <button
+          type="submit"
+          class="btn-primary"
+          id="venue-form-submit"
+          [disabled]="submitting()"
+        >
+          @if (submitting()) {
+            <span class="spinner-sm" aria-hidden="true"></span>
+          }
+          {{ submitting() ? 'Saving…' : (isEdit ? 'Save Changes' : 'Create Venue') }}
+        </button>
+      </div>
+    </form>
+  </div>
 </div>
+
