@@ -8,6 +8,7 @@ export interface Section {
   name: string;
   venue_id: number;
   tier: number;
+  seat_count: number;
 }
 
 export interface SectionModel {
@@ -15,6 +16,7 @@ export interface SectionModel {
   name: string;
   venue_id: number;
   tier: number;
+  seat_count: number;
 }
 
 interface SectionListResponse {

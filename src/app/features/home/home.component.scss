@@ -437,6 +437,39 @@
   }
 }
 
+.btn-book-seats {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  width: 100%;
+  padding: 0.6rem 1rem;
+  margin-top: 0.25rem;
+  background: linear-gradient(135deg, rgba(233, 69, 96, 0.12), rgba(199, 54, 82, 0.12));
+  border: 1px solid rgba(233, 69, 96, 0.35);
+  border-radius: var(--radius-sm);
+  color: #e94560;
+  font-family: inherit;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  transition:
+    background var(--transition-fast),
+    border-color var(--transition-fast),
+    transform var(--transition-fast),
+    box-shadow var(--transition-fast);
+
+  &:hover {
+    background: linear-gradient(135deg, rgba(233, 69, 96, 0.22), rgba(199, 54, 82, 0.22));
+    border-color: rgba(233, 69, 96, 0.6);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 16px rgba(233, 69, 96, 0.2);
+  }
+
+  &:active { transform: translateY(0); }
+}
+
 /* ── Skeleton Cards ── */
 .event-card--skeleton {
   pointer-events: none;

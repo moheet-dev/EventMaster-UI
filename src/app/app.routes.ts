@@ -24,6 +24,14 @@ export const routes: Routes = [
     canActivate: [authGuard],
   },
   {
+    path: 'book/:eventId',
+    loadComponent: () =>
+      import('./features/events/book-event/book-event.component').then(
+        (m) => m.BookEventComponent
+      ),
+    canActivate: [authGuard],
+  },
+  {
     path: '**',
     redirectTo: 'login',
   },

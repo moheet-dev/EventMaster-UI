@@ -8,9 +8,15 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { EventService, EventReq, Event as AppEvent } from '../../../core/services/event.service';
+import { EventService, EventReq, SectionReq, Event as AppEvent } from '../../../core/services/event.service';
 import { VenueService, Venue } from '../../../core/services/venue.service';
+import { SectionService, Section } from '../../../core/services/section.service';
 import { ImageUploadComponent } from '../../../shared/image-upload/image-upload.component';
+
+/** Section extended with the price the user sets for this event */
+export interface EventSectionEntry extends Section {
+  price: number | null;
+}
 
 @Component({
   selector: 'app-event-form',
@@ -40,13 +46,23 @@ export class EventFormComponent implements OnInit {
   loadingVenues = signal(false);
   error = signal<string | null>(null);
 
+  /* ── Sections (loaded after venue selection) ── */
+  eventSections = signal<EventSectionEntry[]>([]);
+  loadingSections = signal(false);
+  sectionsError = signal<string | null>(null);
+
   get isEdit(): boolean {
     return !!this.event;
+  }
+
+  getVenueName(): string {
+    return this.venues.find((v) => v.id === this.venue_id)?.name ?? '—';
   }
 
   constructor(
     private eventSvc: EventService,
     private venueSvc: VenueService,
+    private sectionSvc: SectionService,
   ) {}
 
   ngOnInit(): void {
@@ -59,6 +75,8 @@ export class EventFormComponent implements OnInit {
       if (this.event.event_on) {
         this.event_on = this.event.event_on.slice(0, 16);
       }
+      // Load sections for the pre-selected venue
+      this.loadSections(this.event.venue_id);
     }
 
     this.loadingVenues.set(true);
@@ -71,8 +89,38 @@ export class EventFormComponent implements OnInit {
     });
   }
 
+  onVenueChange(): void {
+    if (!this.venue_id) {
+      this.eventSections.set([]);
+      return;
+    }
+    this.loadSections(this.venue_id);
+  }
+
+  loadSections(venueId: number): void {
+    this.loadingSections.set(true);
+    this.sectionsError.set(null);
+    this.sectionSvc.getSections(venueId).subscribe({
+      next: (list) => {
+        // Map sections to EventSectionEntry with price initialised to null
+        this.eventSections.set(
+          list.map((s) => ({ ...s, price: null }))
+        );
+        this.loadingSections.set(false);
+      },
+      error: () => {
+        this.sectionsError.set('Could not load sections for the selected venue.');
+        this.loadingSections.set(false);
+      },
+    });
+  }
+
   onImageUrl(url: string): void {
     this.display_image = url;
+  }
+
+  trackById(_: number, s: EventSectionEntry): number {
+    return s.id;
   }
 
   submit(): void {
@@ -96,11 +144,49 @@ export class EventFormComponent implements OnInit {
     this.error.set(null);
     this.submitting.set(true);
 
-    const req$ = this.isEdit
-      ? this.eventSvc.update(this.event!.id, payload)
-      : this.eventSvc.create(payload);
+    if (this.isEdit) {
+      // Edit: only update event metadata, no sections
+      this.eventSvc.update(this.event!.id, payload).subscribe({
+        next: () => {
+          this.submitting.set(false);
+          this.saved.emit();
+        },
+        error: (err) => {
+          this.submitting.set(false);
+          this.error.set(err?.message ?? 'Something went wrong. Please try again.');
+        },
+      });
+      return;
+    }
 
-    req$.subscribe({
+    // Create: validate and send sections
+    const sections = this.eventSections();
+
+    if (sections.length === 0) {
+      this.submitting.set(false);
+      this.error.set('The selected venue has no sections configured.');
+      return;
+    }
+
+    const invalidSection = sections.find(
+      (s) => s.price === null || s.price === undefined || s.price <= 0
+    );
+    if (invalidSection) {
+      this.submitting.set(false);
+      this.error.set(`Please enter a valid price (> 0) for section "${invalidSection.name}".`);
+      return;
+    }
+
+    const sectionPayload: SectionReq[] = sections.map((s) => ({
+      id: s.id,
+      name: s.name,
+      venue_id: s.venue_id,
+      tier: s.tier,
+      seat_count: s.seat_count,
+      price: s.price as number,
+    }));
+
+    this.eventSvc.create(payload, sectionPayload).subscribe({
       next: () => {
         this.submitting.set(false);
         this.saved.emit();

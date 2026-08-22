@@ -50,23 +50,105 @@
     <!-- Venue -->
     <div class="field">
       <label class="field__label" for="event-venue">Venue *</label>
-      @if (loadingVenues()) {
-        <div class="field__skeleton" aria-label="Loading venues"></div>
+      @if (isEdit) {
+        <!-- Read-only display in edit mode -->
+        <div class="venue-readonly" id="event-venue-display" aria-label="Selected venue">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M3 21V8l9-6 9 6v13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M9 21V14h6v7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          {{ getVenueName() }}
+        </div>
       } @else {
-        <select
-          id="event-venue"
-          class="field__input field__select"
-          [(ngModel)]="venue_id"
-          name="venue_id"
-          required
-        >
-          <option [ngValue]="null" disabled selected>Select a venue…</option>
-          @for (v of venues; track v.id) {
-            <option [ngValue]="v.id">{{ v.name }}</option>
-          }
-        </select>
+        @if (loadingVenues()) {
+          <div class="field__skeleton" aria-label="Loading venues"></div>
+        } @else {
+          <select
+            id="event-venue"
+            class="field__input field__select"
+            [(ngModel)]="venue_id"
+            name="venue_id"
+            (ngModelChange)="onVenueChange()"
+            required
+          >
+            <option [ngValue]="null" disabled selected>Select a venue…</option>
+            @for (v of venues; track v.id) {
+              <option [ngValue]="v.id">{{ v.name }}</option>
+            }
+          </select>
+        }
       }
     </div>
+
+    <!-- ── Section Pricing Panel ── -->
+    @if (venue_id && !isEdit) {
+      <div class="sections-panel">
+        <!-- Panel header -->
+        <div class="sections-panel__header">
+          <span class="field__label">Section Pricing *</span>
+          <span class="sections-panel__hint">Set a ticket price for every section</span>
+        </div>
+
+        @if (loadingSections()) {
+          <div class="sections-skeleton">
+            <div class="skeleton-row"></div>
+            <div class="skeleton-row"></div>
+            <div class="skeleton-row"></div>
+          </div>
+        } @else if (sectionsError()) {
+          <p class="form-error" role="alert">{{ sectionsError() }}</p>
+        } @else if (eventSections().length === 0) {
+          <p class="sections-empty">No sections found for this venue.</p>
+        } @else {
+          <table class="sections-table" aria-label="Section pricing">
+            <thead>
+              <tr>
+                <th class="col-tier">#</th>
+                <th class="col-name">Section</th>
+                <th class="col-seats">Seats</th>
+                <th class="col-price">Price *</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (section of eventSections(); track section.id; let i = $index) {
+                <tr class="section-row">
+                  <td class="col-tier">{{ section.tier }}</td>
+                  <td class="col-name">
+                    <span class="section-name">{{ section.name }}</span>
+                  </td>
+                  <td class="col-seats">
+                    <span class="seat-badge">
+                      <svg width="12" height="12" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+                        <rect x="2" y="8" width="16" height="8" rx="2" stroke="currentColor" stroke-width="1.8"/>
+                        <path d="M5 8V6a1 1 0 0 1 1-1h8a1 1 0 0 1 1 1v2" stroke="currentColor" stroke-width="1.8"/>
+                      </svg>
+                      {{ section.seat_count }}
+                    </span>
+                  </td>
+                  <td class="col-price">
+                    <div class="price-input-wrap">
+                      <span class="price-currency" aria-hidden="true">₹</span>
+                      <input
+                        class="price-input"
+                        type="number"
+                        min="1"
+                        step="1"
+                        [(ngModel)]="section.price"
+                        [name]="'section-price-' + section.id"
+                        [id]="'section-price-' + section.id"
+                        placeholder="0"
+                        required
+                        [attr.aria-label]="'Price for ' + section.name"
+                      />
+                    </div>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        }
+      </div>
+    }
 
     <!-- Event Date & Time -->
     <div class="field">

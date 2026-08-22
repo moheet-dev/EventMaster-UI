@@ -58,6 +58,7 @@
                 <th class="col-handle" aria-label="Drag handle"></th>
                 <th class="col-tier">#</th>
                 <th class="col-name">Name</th>
+                <th class="col-seats">Seats</th>
                 <th class="col-actions">Actions</th>
               </tr>
             </thead>
@@ -97,6 +98,17 @@
                     }
                   </td>
                   <td class="col-tier">{{ section.tier }}</td>
+
+                  <!-- Seat count cell -->
+                  <td class="col-seats">
+                    <span class="seat-badge">
+                      <svg width="11" height="11" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+                        <rect x="2" y="8" width="16" height="8" rx="2" stroke="currentColor" stroke-width="1.8"/>
+                        <path d="M5 8V6a1 1 0 0 1 1-1h8a1 1 0 0 1 1 1v2" stroke="currentColor" stroke-width="1.8"/>
+                      </svg>
+                      {{ section.seat_count }}
+                    </span>
+                  </td>
 
                   <!-- Name cell: display or inline-edit -->
                   @if (editingSectionId() === section.id) {

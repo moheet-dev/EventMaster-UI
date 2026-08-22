@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, map } from 'rxjs';
 import { environment } from '../../../environments/environment';
 
 export interface Event {
@@ -20,6 +20,15 @@ export interface EventReq {
   display_image: string;
   venue_id: number;
   event_on: string;   // ISO datetime string sent to backend
+}
+
+export interface SectionReq {
+  id: number;
+  name: string;
+  venue_id: number;
+  tier: number;
+  seat_count: number;
+  price: number;
 }
 
 export interface EventFilters {
@@ -70,8 +79,14 @@ export class EventService {
     return this.http.get<EventListResponse>(`${this.base}/events`, { params });
   }
 
-  create(data: EventReq): Observable<EventMutateResponse> {
-    return this.http.post<EventMutateResponse>(`${this.base}/events/add`, data);
+  getById(id: number): Observable<Event> {
+    return this.http
+      .get<{ data: Event; message: string; status: number }>(`${this.base}/events/${id}`)
+      .pipe(map((r) => r.data));
+  }
+
+  create(data: EventReq, sections: SectionReq[]): Observable<EventMutateResponse> {
+    return this.http.post<EventMutateResponse>(`${this.base}/events/add`, { "data": data, "eventSections": sections });
   }
 
   update(id: number, data: EventReq): Observable<EventMutateResponse> {
