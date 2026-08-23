@@ -243,19 +243,15 @@ export class BookEventComponent implements OnInit {
       },
       modal: {
         ondismiss: () => {
-          this.bookingError.set(
-            'Payment was cancelled. Your seats are held for 5 minutes — try again to complete the booking.'
-          );
+          this.router.navigate(['/home']);
         },
       },
     };
 
     const rzp = new Razorpay(options);
 
-    rzp.on('payment.failed', (response: { error: { description: string } }) => {
-      this.bookingError.set(
-        response?.error?.description ?? 'Payment failed. Please try again.'
-      );
+    rzp.on('payment.failed', (_response: { error: { description: string } }) => {
+      this.router.navigate(['/home']);
     });
 
     rzp.open();
@@ -281,6 +277,8 @@ export class BookEventComponent implements OnInit {
         this.paymentProcessing.set(false);
         this.bookingSuccess.set(true);
         this.selectedSeats.set([]);
+        // Redirect to events page after a brief moment so the user sees the success banner
+        setTimeout(() => this.router.navigate(['/home']), 2000);
       },
       error: (err) => {
         this.paymentProcessing.set(false);
