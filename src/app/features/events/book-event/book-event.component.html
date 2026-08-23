@@ -178,12 +178,22 @@
           }
         </div>
 
-        @if (selectedSeats().length === 0) {
+        @if (bookingSuccess()) {
+          <div class="booking-feedback booking-feedback--success" role="status">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+              <path d="M8 12l3 3 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            Booking confirmed! Your seats have been reserved.
+          </div>
+        }
+
+        @if (!bookingSuccess() && selectedSeats().length === 0) {
           <div class="sidebar__empty">
             <span aria-hidden="true">🎟️</span>
             <p>Click seats on the map to select them.</p>
           </div>
-        } @else {
+        } @else if (!bookingSuccess()) {
           <ul class="selected-list" role="list">
             @for (seat of selectedSeats(); track (seat.sectionId + '-' + seat.code)) {
               <li class="selected-item">
@@ -217,11 +227,32 @@
             </div>
           </div>
 
-          <button class="btn-book" id="proceed-to-book-btn" aria-label="Proceed to payment">
-            Proceed to Pay
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-              <path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
+          @if (bookingError()) {
+            <div class="booking-feedback booking-feedback--error" role="alert">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+                <path d="M12 8v4M12 16h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+              {{ bookingError() }}
+            </div>
+          }
+
+          <button
+            class="btn-book"
+            id="proceed-to-book-btn"
+            aria-label="Proceed to payment"
+            [disabled]="booking()"
+            (click)="proceedToBook()"
+          >
+            @if (booking()) {
+              <span class="btn-spinner" aria-hidden="true"></span>
+              Processing…
+            } @else {
+              Proceed to Pay
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            }
           </button>
         }
       </aside>

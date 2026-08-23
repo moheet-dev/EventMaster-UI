@@ -722,3 +722,43 @@
     overflow: visible;
   }
 }
+
+/* ── Booking feedback banners ── */
+.booking-feedback {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.65rem 0.9rem;
+  border-radius: 8px;
+  font-size: 0.82rem;
+  font-weight: 500;
+  line-height: 1.4;
+  margin-bottom: 0.75rem;
+
+  &--success {
+    background: rgba(62, 207, 142, 0.12);
+    color: #3ecf8e;
+    border: 1px solid rgba(62, 207, 142, 0.3);
+  }
+
+  &--error {
+    background: rgba(233, 69, 96, 0.12);
+    color: #e94560;
+    border: 1px solid rgba(233, 69, 96, 0.3);
+  }
+
+  svg { flex-shrink: 0; }
+}
+
+/* ── Button spinner ── */
+.btn-spinner {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(255,255,255,0.35);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  flex-shrink: 0;
+}
+

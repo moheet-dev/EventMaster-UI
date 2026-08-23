@@ -14,7 +14,9 @@ import {
   BookingService,
   BookingSectionWithSeats,
   BookingSeat,
+  BookSeatsPayload,
 } from '../../../core/services/booking.service';
+
 
 export interface SelectedSeat {
   sectionId: number;
@@ -47,6 +49,11 @@ export class BookEventComponent implements OnInit {
 
   /* ── Seat selection ── */
   selectedSeats = signal<SelectedSeat[]>([]);
+
+  /* ── Booking state ── */
+  booking = signal(false);
+  bookingError = signal<string | null>(null);
+  bookingSuccess = signal(false);
 
   /* ── Section colours (one per tier, cycling if >5) ── */
   private readonly SECTION_COLOURS = [
@@ -121,6 +128,11 @@ export class BookEventComponent implements OnInit {
 
   /* ── Section tab ── */
   selectSection(index: number): void {
+    if (this.activeSectionIndex() === index) return;
+    // Clear any previously selected seats from a different section
+    this.selectedSeats.set([]);
+    this.bookingError.set(null);
+    this.bookingSuccess.set(false);
     this.activeSectionIndex.set(index);
   }
 
@@ -162,6 +174,37 @@ export class BookEventComponent implements OnInit {
     this.selectedSeats.update((seats) =>
       seats.filter((s) => !(s.sectionId === seat.sectionId && s.code === seat.code))
     );
+  }
+
+  /* ── Proceed / Book ── */
+  proceedToBook(): void {
+    const seats = this.selectedSeats();
+    const sec = this.activeSection();
+    if (!seats.length || !sec) return;
+
+    const payload: BookSeatsPayload = {
+      section_id: sec.id,
+      event_id: this.eventId,
+      seats: seats.map((s) => s.seatId),
+    };
+
+    this.booking.set(true);
+    this.bookingError.set(null);
+    this.bookingSuccess.set(false);
+
+    this.bookingSvc.bookSeats(payload).subscribe({
+      next: () => {
+        this.booking.set(false);
+        this.bookingSuccess.set(true);
+        this.selectedSeats.set([]);
+      },
+      error: (err) => {
+        this.booking.set(false);
+        const msg =
+          err?.error?.message ?? err?.error?.detail ?? 'Booking failed. Please try again.';
+        this.bookingError.set(msg);
+      },
+    });
   }
 
   /* ── Display rows helper ── */

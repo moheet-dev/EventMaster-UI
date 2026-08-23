@@ -5,6 +5,20 @@ import { environment } from '../../../environments/environment';
 import { SectionService, Section } from './section.service';
 import { SeatService, SeatRow } from './seat.service';
 
+// ── Book-seats payload / response ─────────────────────────────────────────────
+
+export interface BookSeatsPayload {
+  section_id: number;
+  event_id: number;
+  seats: number[];
+}
+
+export interface BookSeatsResponse {
+  message: string;
+  status: number;
+  data?: unknown;
+}
+
 // ── Booking-API specific interfaces ──────────────────────────────────────────
 
 export interface BookingSection {
@@ -136,5 +150,12 @@ export class BookingService {
         );
       })
     );
+  }
+
+  // ── Book seats ────────────────────────────────────────────────────────────────
+
+  /** POST /bookings/book */
+  bookSeats(payload: BookSeatsPayload): Observable<BookSeatsResponse> {
+    return this.http.post<BookSeatsResponse>(`${this.base}/bookings/book`, payload);
   }
 }
