@@ -218,6 +218,16 @@ export class BookEventComponent implements OnInit {
   /* ── Razorpay Checkout ── */
   private openRazorpay(orderId: string, amount: number): void {
     const ev = this.event();
+    // Guard: payment.failed fires first, then ondismiss also fires.
+    // Without this flag both callbacks would call router.navigate, causing
+    // a double navigation that creates a duplicate history entry and
+    // sometimes bounces the user back to the booking page.
+    let navigated = false;
+    const navigateHome = () => {
+      if (navigated) return;
+      navigated = true;
+      this.router.navigate(['/home']);
+    };
 
     const options = {
       key: environment.razorpayKeyId,
@@ -242,16 +252,14 @@ export class BookEventComponent implements OnInit {
         );
       },
       modal: {
-        ondismiss: () => {
-          this.router.navigate(['/home']);
-        },
+        ondismiss: () => navigateHome(),
       },
     };
 
     const rzp = new Razorpay(options);
 
     rzp.on('payment.failed', (_response: { error: { description: string } }) => {
-      this.router.navigate(['/home']);
+      navigateHome();
     });
 
     rzp.open();
