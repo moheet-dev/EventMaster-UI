@@ -747,6 +747,12 @@
     border: 1px solid rgba(233, 69, 96, 0.3);
   }
 
+  &--verifying {
+    background: rgba(240, 165, 0, 0.12);
+    color: #f0a500;
+    border: 1px solid rgba(240, 165, 0, 0.3);
+  }
+
   svg { flex-shrink: 0; }
 }
 
@@ -760,5 +766,10 @@
   border-radius: 50%;
   animation: spin 0.7s linear infinite;
   flex-shrink: 0;
+
+  &--dark {
+    border-color: rgba(240, 165, 0, 0.35);
+    border-top-color: #f0a500;
+  }
 }
 

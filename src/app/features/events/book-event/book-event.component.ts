@@ -15,8 +15,12 @@ import {
   BookingSectionWithSeats,
   BookingSeat,
   BookSeatsPayload,
+  PaymentVerifyPayload,
 } from '../../../core/services/booking.service';
+import { environment } from '../../../../environments/environment';
 
+// Declare Razorpay global (loaded via checkout.js in index.html)
+declare const Razorpay: any;
 
 export interface SelectedSeat {
   sectionId: number;
@@ -54,6 +58,10 @@ export class BookEventComponent implements OnInit {
   booking = signal(false);
   bookingError = signal<string | null>(null);
   bookingSuccess = signal(false);
+
+  /* ── Payment state ── */
+  paymentProcessing = signal(false);
+  paymentError = signal<string | null>(null);
 
   /* ── Section colours (one per tier, cycling if >5) ── */
   private readonly SECTION_COLOURS = [
@@ -193,16 +201,94 @@ export class BookEventComponent implements OnInit {
     this.bookingSuccess.set(false);
 
     this.bookingSvc.bookSeats(payload).subscribe({
-      next: () => {
+      next: (res) => {
         this.booking.set(false);
-        this.bookingSuccess.set(true);
-        this.selectedSeats.set([]);
+        // Open Razorpay checkout with the order details from the backend
+        this.openRazorpay(res.data.order_id, res.data.amount);
       },
       error: (err) => {
         this.booking.set(false);
         const msg =
           err?.error?.message ?? err?.error?.detail ?? 'Booking failed. Please try again.';
         this.bookingError.set(msg);
+      },
+    });
+  }
+
+  /* ── Razorpay Checkout ── */
+  private openRazorpay(orderId: string, amount: number): void {
+    const ev = this.event();
+
+    const options = {
+      key: environment.razorpayKeyId,
+      amount: amount * 100, // Razorpay expects paise
+      currency: 'INR',
+      name: 'EventMaster',
+      description: ev ? `Tickets — ${ev.name}` : 'Event Ticket Booking',
+      order_id: orderId,
+      theme: {
+        color: '#e94560',
+      },
+      handler: (response: {
+        razorpay_payment_id: string;
+        razorpay_order_id: string;
+        razorpay_signature: string;
+      }) => {
+        // Payment captured successfully by Razorpay
+        this.onPaymentSuccess(
+          response.razorpay_payment_id,
+          response.razorpay_order_id,
+          response.razorpay_signature
+        );
+      },
+      modal: {
+        ondismiss: () => {
+          this.bookingError.set(
+            'Payment was cancelled. Your seats are held for 5 minutes — try again to complete the booking.'
+          );
+        },
+      },
+    };
+
+    const rzp = new Razorpay(options);
+
+    rzp.on('payment.failed', (response: { error: { description: string } }) => {
+      this.bookingError.set(
+        response?.error?.description ?? 'Payment failed. Please try again.'
+      );
+    });
+
+    rzp.open();
+  }
+
+  /* ── Payment Success Handler ── */
+  private onPaymentSuccess(
+    paymentId: string,
+    orderId: string,
+    signature: string
+  ): void {
+    const payload: PaymentVerifyPayload = {
+      payment_id: paymentId,
+      order_id: orderId,
+      signature,
+    };
+
+    this.paymentProcessing.set(true);
+    this.paymentError.set(null);
+
+    this.bookingSvc.verifyPayment(payload).subscribe({
+      next: () => {
+        this.paymentProcessing.set(false);
+        this.bookingSuccess.set(true);
+        this.selectedSeats.set([]);
+      },
+      error: (err) => {
+        this.paymentProcessing.set(false);
+        const msg =
+          err?.error?.detail ??
+          err?.error?.message ??
+          'Payment verification failed. Please contact support.';
+        this.paymentError.set(msg);
       },
     });
   }

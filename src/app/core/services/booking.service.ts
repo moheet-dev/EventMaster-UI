@@ -13,10 +13,28 @@ export interface BookSeatsPayload {
   seats: number[];
 }
 
+export interface RazorpayOrderData {
+  order_id: string;
+  amount: number; // in INR (not paise)
+}
+
 export interface BookSeatsResponse {
   message: string;
   status: number;
-  data?: unknown;
+  data: RazorpayOrderData;
+}
+
+// ── Payment verification ──────────────────────────────────────────────────────
+
+export interface PaymentVerifyPayload {
+  order_id: string;
+  payment_id: string;
+  signature: string;
+}
+
+export interface PaymentVerifyResponse {
+  message: string;
+  status: number;
 }
 
 // ── Booking-API specific interfaces ──────────────────────────────────────────
@@ -157,5 +175,12 @@ export class BookingService {
   /** POST /bookings/book */
   bookSeats(payload: BookSeatsPayload): Observable<BookSeatsResponse> {
     return this.http.post<BookSeatsResponse>(`${this.base}/bookings/book`, payload);
+  }
+
+  // ── Verify payment ───────────────────────────────────────────────────────────
+
+  /** POST /bookings/book/verify */
+  verifyPayment(payload: PaymentVerifyPayload): Observable<PaymentVerifyResponse> {
+    return this.http.post<PaymentVerifyResponse>(`${this.base}/bookings/book/verify`, payload);
   }
 }
