@@ -42,3 +42,6 @@ __screenshots__/
 # System files
 .DS_Store
 Thumbs.db
+
+# Environment config (contains API keys — copy environment.example.ts → environment.ts)
+src/environments/environment.ts
