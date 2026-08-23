@@ -87,6 +87,28 @@ interface BookingSeatsResponse {
   status: number;
 }
 
+// ── User booking list ─────────────────────────────────────────────────────────
+
+export interface UserBooking {
+  id: number;
+  total_amount: number;
+  event_name: string;
+  description: string;
+  display_image: string | null;
+  event_on: string;
+  venue_name: string;
+  address: string;
+  status: 'CONFIRMED' | 'PENDING' | 'CANCELLED';
+  created_at: string;
+}
+
+export interface BookedSeat {
+  section_name: string;
+  row_number: number;
+  code: string;
+  price: number;
+}
+
 // ── Service ───────────────────────────────────────────────────────────────────
 
 @Injectable({ providedIn: 'root' })
@@ -182,5 +204,21 @@ export class BookingService {
   /** POST /bookings/book/verify */
   verifyPayment(payload: PaymentVerifyPayload): Observable<PaymentVerifyResponse> {
     return this.http.post<PaymentVerifyResponse>(`${this.base}/bookings/book/verify`, payload);
+  }
+
+  // ── My Bookings ───────────────────────────────────────────────────────────────
+
+  /** GET /bookings — list all bookings for the logged-in user */
+  getMyBookings(): Observable<UserBooking[]> {
+    return this.http
+      .get<{ data: UserBooking[]; message: string; status: number }>(`${this.base}/bookings`)
+      .pipe(map((r) => r.data));
+  }
+
+  /** GET /bookings/:bookingId — seat details for a specific booking */
+  getBookingSeats(bookingId: number): Observable<BookedSeat[]> {
+    return this.http
+      .get<{ data: BookedSeat[]; message: string; status: number }>(`${this.base}/bookings/${bookingId}`)
+      .pipe(map((r) => r.data));
   }
 }

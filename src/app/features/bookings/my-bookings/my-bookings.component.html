@@ -1,0 +1,221 @@
+<main class="bookings-page" aria-label="My Bookings">
+
+  <!-- Background orbs -->
+  <div class="bg-orb bg-orb--1" aria-hidden="true"></div>
+  <div class="bg-orb bg-orb--2" aria-hidden="true"></div>
+
+  <!-- ══ Navbar ══ -->
+  <header class="navbar" role="banner">
+    <div class="brand">
+      <svg width="30" height="30" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+        <rect width="32" height="32" rx="10" fill="#E94560" />
+        <path d="M8 16L14 22L24 10" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
+      </svg>
+      <span class="brand__name">EventMaster</span>
+    </div>
+
+    <nav class="navbar__actions" aria-label="Navigation">
+      <button class="btn-outline" id="nav-back-home" (click)="goHome()" aria-label="Back to Events">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M19 12H5M12 19l-7-7 7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        Back to Events
+      </button>
+    </nav>
+  </header>
+
+  <!-- ══ Page content ══ -->
+  <div class="page-content">
+
+    <div class="page-heading">
+      <h1 class="page-title">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M20 12V22H4V12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M22 7H2v5h20V7z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M12 22V7M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7zM12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        My Bookings
+      </h1>
+      <p class="page-subtitle">All your booked events in one place</p>
+    </div>
+
+    <!-- ── Loading ── -->
+    @if (loading()) {
+      <div class="state-screen" role="status">
+        <div class="loader-ring"></div>
+        <p>Loading your bookings…</p>
+      </div>
+    }
+
+    <!-- ── Error ── -->
+    @if (!loading() && error()) {
+      <div class="state-screen state-screen--error" role="alert">
+        <span class="state-icon" aria-hidden="true">⚠️</span>
+        <p>{{ error() }}</p>
+        <button class="btn-retry" id="retry-bookings-btn" (click)="loadBookings()">Try Again</button>
+      </div>
+    }
+
+    <!-- ── Empty ── -->
+    @if (!loading() && !error() && bookings().length === 0) {
+      <div class="state-screen" role="status">
+        <span class="state-icon" aria-hidden="true">🎟️</span>
+        <p class="state-title">No bookings yet</p>
+        <p class="state-sub">Book an event to see it here.</p>
+        <button class="btn-accent" id="go-explore-btn" (click)="goHome()">Explore Events</button>
+      </div>
+    }
+
+    <!-- ── Booking rows ── -->
+    @if (!loading() && !error() && bookings().length > 0) {
+      <div class="bookings-list" role="list">
+        @for (booking of bookings(); track booking.id) {
+          <article
+            class="booking-row"
+            role="listitem"
+            [id]="'booking-' + booking.id"
+            (click)="openDetail(booking)"
+            (keydown.enter)="openDetail(booking)"
+            tabindex="0"
+            aria-label="Booking for {{ booking.event_name }}"
+          >
+            <!-- Thumbnail -->
+            <div class="booking-row__thumb">
+              @if (booking.display_image) {
+                <img [src]="booking.display_image" [alt]="booking.event_name" loading="lazy" />
+              } @else {
+                <div class="booking-row__thumb-placeholder" aria-hidden="true">🎉</div>
+              }
+            </div>
+
+            <!-- Info -->
+            <div class="booking-row__info">
+              <div class="booking-row__top">
+                <h2 class="booking-row__event">{{ booking.event_name }}</h2>
+                <span class="booking-row__status" [class]="statusClass(booking.status)">
+                  {{ booking.status }}
+                </span>
+              </div>
+
+              <p class="booking-row__desc">{{ booking.description }}</p>
+
+              <div class="booking-row__meta">
+                <span class="meta-chip">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                    <rect x="3" y="4" width="18" height="18" rx="2" stroke="currentColor" stroke-width="2"/>
+                    <path d="M16 2v4M8 2v4M3 10h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                  </svg>
+                  {{ formatDate(booking.event_on) }}
+                </span>
+                <span class="meta-chip">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                    <path d="M3 21V8l9-6 9 6v13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                  {{ booking.venue_name }} · {{ booking.address }}
+                </span>
+              </div>
+            </div>
+
+            <!-- Amount -->
+            <div class="booking-row__amount">
+              <span class="amount-value">{{ formatPrice(booking.total_amount) }}</span>
+              <span class="amount-label">Booked {{ formatDateShort(booking.created_at) }}</span>
+            </div>
+
+            <!-- Arrow -->
+            <div class="booking-row__arrow" aria-hidden="true">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                <path d="M9 18l6-6-6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+          </article>
+        }
+      </div>
+    }
+  </div>
+
+  <!-- ══ Booking Detail Modal ══ -->
+  @if (showModal()) {
+    <div class="modal-overlay" (click)="closeModal()" role="dialog" aria-modal="true"
+         [attr.aria-label]="'Booking details for ' + selectedBooking()?.event_name">
+
+      <div class="modal" (click)="$event.stopPropagation()">
+
+        <!-- Modal header -->
+        <div class="modal__header">
+          <div class="modal__title-group">
+            <h2 class="modal__title">{{ selectedBooking()?.event_name }}</h2>
+            <p class="modal__subtitle">{{ selectedBooking()?.description }}</p>
+          </div>
+          <button class="modal__close" id="close-modal-btn" (click)="closeModal()" aria-label="Close modal">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </button>
+        </div>
+
+        <!-- Booking summary strip -->
+        <div class="modal__summary">
+          <div class="summary-item">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <rect x="3" y="4" width="18" height="18" rx="2" stroke="currentColor" stroke-width="2"/>
+              <path d="M16 2v4M8 2v4M3 10h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+            <span>{{ formatDate(selectedBooking()!.event_on) }}</span>
+          </div>
+          <div class="summary-item">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M3 21V8l9-6 9 6v13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <span>{{ selectedBooking()?.venue_name }} · {{ selectedBooking()?.address }}</span>
+          </div>
+          <div class="summary-item summary-item--total">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <rect x="2" y="5" width="20" height="14" rx="2" stroke="currentColor" stroke-width="2"/>
+              <path d="M2 10h20" stroke="currentColor" stroke-width="2"/>
+            </svg>
+            <span>Total paid: <strong>{{ formatPrice(selectedBooking()!.total_amount) }}</strong></span>
+          </div>
+          <span class="modal__badge" [class]="statusClass(selectedBooking()!.status)">
+            {{ selectedBooking()?.status }}
+          </span>
+        </div>
+
+        <!-- Seat details -->
+        <div class="modal__seats">
+          <h3 class="modal__seats-title">Seat Details</h3>
+
+          @if (detailLoading()) {
+            <div class="detail-loading" role="status">
+              <div class="loader-ring loader-ring--sm"></div>
+              <span>Loading seats…</span>
+            </div>
+          }
+
+          @if (detailError()) {
+            <p class="detail-error" role="alert">{{ detailError() }}</p>
+          }
+
+          @if (!detailLoading() && !detailError() && detailSeats().length > 0) {
+            @for (group of groupedSeats(); track group.section) {
+              <div class="seat-group">
+                <p class="seat-group__label">{{ group.section }}</p>
+                <div class="seat-chips">
+                  @for (seat of group.seats; track seat.code) {
+                    <div class="seat-chip" [id]="'seat-chip-' + seat.code">
+                      <span class="seat-chip__code">{{ seat.code }}</span>
+                      <span class="seat-chip__row">Row {{ seat.row_number }}</span>
+                      <span class="seat-chip__price">{{ formatPrice(seat.price) }}</span>
+                    </div>
+                  }
+                </div>
+              </div>
+            }
+          }
+        </div>
+
+      </div>
+    </div>
+  }
+
+</main>

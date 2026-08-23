@@ -277,8 +277,8 @@ export class BookEventComponent implements OnInit {
         this.paymentProcessing.set(false);
         this.bookingSuccess.set(true);
         this.selectedSeats.set([]);
-        // Redirect to events page after a brief moment so the user sees the success banner
-        setTimeout(() => this.router.navigate(['/home']), 2000);
+        // Redirect to My Bookings so the user can see their confirmed ticket
+        setTimeout(() => this.router.navigate(['/my-bookings']), 2000);
       },
       error: (err) => {
         this.paymentProcessing.set(false);

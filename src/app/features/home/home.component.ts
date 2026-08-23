@@ -258,6 +258,10 @@ export class HomeComponent implements OnInit, OnDestroy {
     });
   }
 
+  goToMyBookings(): void {
+    this.router.navigate(['/my-bookings']);
+  }
+
   logout(): void {
     this.authSvc.logout();
     this.router.navigate(['/login']);
