@@ -85,8 +85,8 @@
 /* ── Header ── */
 .booking-header {
   display: flex;
-  align-items: center;
-  gap: 1.25rem;
+  align-items: flex-start;
+  gap: 1rem;
   padding: 0.85rem 1.5rem;
   background: var(--color-2);
   border-bottom: 1px solid var(--border-subtle);
@@ -128,15 +128,15 @@
   font-size: 1.15rem;
   font-weight: 800;
   letter-spacing: -0.02em;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  white-space: normal;
+  word-break: break-word;
+  line-height: 1.3;
 }
 
 .booking-header__meta {
   display: flex;
-  align-items: center;
-  gap: 0.75rem;
+  align-items: flex-start;
+  gap: 0.5rem 0.75rem;
   flex-wrap: wrap;
 }
 
@@ -146,16 +146,34 @@
   gap: 0.35rem;
   font-size: 0.78rem;
   color: var(--text-secondary);
+  min-width: 0;
 
-  svg { color: var(--text-muted); }
+  svg { color: var(--text-muted); flex-shrink: 0; }
+
+  &--desc {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    max-width: 40ch;
+  }
 }
 
 /* Price legend */
 .header-legend {
   display: flex;
-  align-items: center;
-  gap: 1rem;
+  align-items: flex-start;
+  gap: 0.75rem 1rem;
   flex-wrap: wrap;
+  /* Push legend to new row on smaller widths by giving info flex priority */
+  flex-basis: 100%;
+  margin-top: 0.25rem;
+
+  @media (min-width: 900px) {
+    flex-basis: auto;
+    margin-top: 0;
+    margin-left: auto;
+  }
 }
 
 .legend-item {
@@ -720,6 +738,116 @@
     border-left: none;
     border-top: 1px solid var(--border-subtle);
     overflow: visible;
+  }
+}
+
+/* ── Responsive: tablet (≤ 768px) ── */
+@media (max-width: 768px) {
+  .booking-header {
+    padding: 0.75rem 1rem;
+    gap: 0.75rem;
+  }
+
+  .booking-header__title {
+    font-size: 1rem;
+  }
+
+  .header-chip {
+    font-size: 0.74rem;
+
+    &--desc {
+      max-width: 100%;
+      -webkit-line-clamp: 2;
+    }
+  }
+
+  .legend-item {
+    font-size: 0.74rem;
+  }
+
+  .seat-canvas {
+    padding: 1rem 1rem 1.5rem;
+  }
+
+  .section-tabs {
+    gap: 0.4rem;
+  }
+
+  .section-tab {
+    font-size: 0.78rem;
+    padding: 0.4rem 0.7rem;
+  }
+}
+
+/* ── Responsive: mobile (≤ 480px) ── */
+@media (max-width: 480px) {
+  .booking-header {
+    padding: 0.65rem 0.85rem;
+    gap: 0.6rem;
+  }
+
+  .btn-back-header {
+    width: 34px;
+    height: 34px;
+    flex-shrink: 0;
+  }
+
+  .booking-header__title {
+    font-size: 0.95rem;
+  }
+
+  .booking-header__meta {
+    gap: 0.4rem 0.6rem;
+  }
+
+  .header-chip {
+    font-size: 0.7rem;
+
+    &--desc {
+      -webkit-line-clamp: 3;
+    }
+  }
+
+  .header-legend {
+    gap: 0.5rem 0.75rem;
+  }
+
+  .legend-item {
+    font-size: 0.7rem;
+  }
+
+  .legend-dot {
+    width: 8px;
+    height: 8px;
+  }
+
+  .seat-canvas {
+    padding: 0.75rem 0.75rem 1.25rem;
+  }
+
+  .seat-cell {
+    width: 30px;
+    height: 30px;
+    font-size: 0.55rem;
+  }
+
+  .seat-code {
+    font-size: 0.52rem;
+  }
+
+  .section-tab {
+    font-size: 0.74rem;
+    padding: 0.35rem 0.6rem;
+  }
+
+  .section-tab__seats {
+    display: none;
+  }
+
+  .btn-book {
+    margin: 0 0.85rem 0.85rem;
+    font-size: 0.9rem;
+    padding: 0.75rem 1.25rem;
   }
 }
 
