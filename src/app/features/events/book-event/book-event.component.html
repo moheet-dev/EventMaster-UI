@@ -120,16 +120,16 @@
                         <button
                           class="seat-cell"
                           [class.seat-cell--selected]="isSeatSelected(activeSection()!.id, seat.code)"
-                          [class.seat-cell--booked]="seat.status === 'BOOKED'"
-                          [class.seat-cell--held]="seat.status === 'HELD'"
+                          [class.seat-cell--booked]="getSeatStatus(seat) === 'SOLD'"
+                          [class.seat-cell--held]="getSeatStatus(seat) === 'HELD'"
                           [style.--section-color]="sectionColor(activeSection()!.tier)"
-                          [disabled]="seat.status !== 'AVAILABLE'"
+                          [disabled]="getSeatStatus(seat) !== 'AVAILABLE'"
                           (click)="toggleSeat(seat, row.row_number)"
                           [id]="'seat-' + activeSection()!.id + '-' + seat.seat_id"
-                          [attr.aria-label]="'Seat ' + seat.code + ' (' + seat.status + ')' + (isSeatSelected(activeSection()!.id, seat.code) ? ' selected' : '')"
+                          [attr.aria-label]="'Seat ' + seat.code + ' (' + getSeatStatus(seat) + ')' + (isSeatSelected(activeSection()!.id, seat.code) ? ' selected' : '')"
                           [attr.aria-pressed]="isSeatSelected(activeSection()!.id, seat.code)"
-                          [attr.aria-disabled]="seat.status !== 'AVAILABLE'"
-                          title="{{ seat.code }} — {{ seat.status }}"
+                          [attr.aria-disabled]="getSeatStatus(seat) !== 'AVAILABLE'"
+                          title="{{ seat.code }} — {{ getSeatStatus(seat) }}"
                         >
                           <span class="seat-code">{{ seat.code }}</span>
                         </button>

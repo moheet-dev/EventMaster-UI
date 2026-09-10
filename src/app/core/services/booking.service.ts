@@ -49,7 +49,7 @@ export interface BookingSection {
 }
 
 export interface BookingSeat {
-  status: 'AVAILABLE' | 'BOOKED' | 'HELD';
+  status: 'AVAILABLE' | 'HELD' | 'SOLD';
   timeout_at: string | null;
   seat_id: number;
   code: string;

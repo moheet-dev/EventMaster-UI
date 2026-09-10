@@ -172,7 +172,7 @@ Protected by `authGuard`.
 
 **Data loading:**
 - Fetches event details, all venues, and all sections with live seat availability in parallel using `forkJoin`
-- Seat statuses: `AVAILABLE` | `BOOKED` | `HELD`
+- Seat statuses: `AVAILABLE` | `SOLD` | `HELD`
 
 **Header:**
 - Event name, venue name, date/time, and description
@@ -189,7 +189,7 @@ Protected by `authGuard`.
 - Seat states:
   - **Available** — clickable, highlights on hover with section colour
   - **Selected** — filled with section colour + glow shadow
-  - **Booked** — greyed out, strikethrough seat code, not clickable
+  - **SOLD** — greyed out, strikethrough seat code, not clickable
   - **Held** — amber tint, not clickable (temporarily reserved by another user)
 - Empty rows (no seats) rendered as a faded "empty row" bar
 

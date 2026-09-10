@@ -151,8 +151,25 @@ export class BookEventComponent implements OnInit {
     );
   }
 
+  /**
+   * Resolves the effective display status of a seat using lazy-expiry logic:
+   * - SOLD      → status is SOLD
+   * - HELD      → status is HELD **and** timeout_at is in the future
+   * - AVAILABLE → status is AVAILABLE **or** (status HELD with timeout_at expired)
+   */
+  getSeatStatus(seat: BookingSeat): 'AVAILABLE' | 'HELD' | 'SOLD' {
+    if (seat.status === 'SOLD') return 'SOLD';
+    if (seat.status === 'HELD') {
+      const expired = seat.timeout_at
+        ? new Date(seat.timeout_at) <= new Date()
+        : true; // no timeout set → treat as expired
+      return expired ? 'AVAILABLE' : 'HELD';
+    }
+    return 'AVAILABLE';
+  }
+
   toggleSeat(seat: BookingSeat, rowNumber: number): void {
-    if (seat.status !== 'AVAILABLE') return;
+    if (this.getSeatStatus(seat) !== 'AVAILABLE') return;
 
     const sec = this.activeSection();
     if (!sec) return;
