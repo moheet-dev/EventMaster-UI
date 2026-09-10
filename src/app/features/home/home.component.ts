@@ -264,6 +264,6 @@ export class HomeComponent implements OnInit, OnDestroy {
 
   logout(): void {
     this.authSvc.logout();
-    this.router.navigate(['/login']);
+    this.router.navigate(['/']);
   }
 }

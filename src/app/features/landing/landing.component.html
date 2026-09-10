@@ -1,0 +1,258 @@
+<div class="landing" aria-label="EventMaster Landing Page">
+
+  <!-- Background orbs -->
+  <div class="bg-orb bg-orb--1" aria-hidden="true"></div>
+  <div class="bg-orb bg-orb--2" aria-hidden="true"></div>
+  <div class="bg-orb bg-orb--3" aria-hidden="true"></div>
+
+  <!-- ═══════════════════ NAVBAR ═══════════════════ -->
+  <header class="navbar" role="banner">
+    <div class="brand">
+      <div class="brand__icon" aria-hidden="true">
+        <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect width="32" height="32" rx="10" fill="#E94560"/>
+          <path d="M8 16L14 22L24 10" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <span class="brand__name">EventMaster</span>
+    </div>
+
+    <nav class="navbar__actions" aria-label="Landing navigation">
+      <a routerLink="/login" class="nav-link" id="nav-signin">Sign In</a>
+      <a routerLink="/register" class="nav-cta" id="nav-get-started">Get Started</a>
+    </nav>
+  </header>
+
+  <!-- ═══════════════════ HERO ═══════════════════ -->
+  <section class="hero" aria-labelledby="hero-heading">
+    <div class="hero__content">
+      <div class="hero__badge">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        The smarter way to manage events
+      </div>
+      <h1 class="hero__title" id="hero-heading">
+        Plan. Book.<br/>
+        <span class="hero__title--accent">Experience.</span>
+      </h1>
+      <p class="hero__subtitle">
+        Create unforgettable events, manage venues with precision, and let your audience
+        book seats effortlessly — all from one beautiful platform.
+      </p>
+      <div class="hero__actions">
+        <a routerLink="/register" class="btn-hero-primary" id="hero-get-started">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          Get Started Free
+        </a>
+        <a routerLink="/login" class="btn-hero-secondary" id="hero-sign-in">
+          Sign In
+        </a>
+      </div>
+
+      <!-- Stats row -->
+      <div class="hero__stats">
+        <div class="stat">
+          <span class="stat__number">100%</span>
+          <span class="stat__label">Free to Use</span>
+        </div>
+        <div class="stat__divider" aria-hidden="true"></div>
+        <div class="stat">
+          <span class="stat__number">Real-time</span>
+          <span class="stat__label">Seat Booking</span>
+        </div>
+        <div class="stat__divider" aria-hidden="true"></div>
+        <div class="stat">
+          <span class="stat__number">Full</span>
+          <span class="stat__label">Venue Control</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Hero visual -->
+    <div class="hero__visual" aria-hidden="true">
+      <div class="hero__card hero__card--1">
+        <div class="hero__card-icon">🎭</div>
+        <span>Live Concert</span>
+        <span class="hero__card-badge">120 seats</span>
+      </div>
+      <div class="hero__card hero__card--2">
+        <div class="hero__card-icon">🏛️</div>
+        <span>Grand Arena</span>
+        <span class="hero__card-badge">4 sections</span>
+      </div>
+      <div class="hero__card hero__card--3">
+        <div class="hero__card-icon">🎟️</div>
+        <span>Booking #1024</span>
+        <span class="hero__card-badge hero__card-badge--success">Confirmed</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════ FEATURES ═══════════════════ -->
+  <section class="features" aria-labelledby="features-heading">
+    <div class="section-container">
+      <div class="section-header">
+        <span class="section-tag">Features</span>
+        <h2 class="section-title" id="features-heading">Everything you need to run events</h2>
+        <p class="section-subtitle">From creating events to managing bookings, EventMaster has you covered with powerful tools designed for organizers and attendees.</p>
+      </div>
+
+      <div class="features-grid">
+
+        <!-- Feature 1 -->
+        <article class="feature-card" id="feature-events">
+          <div class="feature-card__icon-wrap feature-card__icon-wrap--red">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <rect x="3" y="4" width="18" height="18" rx="2" stroke="currentColor" stroke-width="1.8"/>
+              <path d="M16 2v4M8 2v4M3 10h18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+              <circle cx="12" cy="16" r="2" fill="currentColor"/>
+            </svg>
+          </div>
+          <h3 class="feature-card__title">Create &amp; Manage Events</h3>
+          <p class="feature-card__desc">Organize events with rich descriptions, cover images, dates, and venue assignments. Edit and manage everything from your dashboard.</p>
+          <div class="feature-card__tags">
+            <span class="tag">Images</span>
+            <span class="tag">Dates</span>
+            <span class="tag">Venues</span>
+          </div>
+        </article>
+
+        <!-- Feature 2 -->
+        <article class="feature-card" id="feature-venues">
+          <div class="feature-card__icon-wrap feature-card__icon-wrap--blue">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M3 21V8l9-6 9 6v13" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M9 21V14h6v7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <h3 class="feature-card__title">Venue Management</h3>
+          <p class="feature-card__desc">Create venues with detailed addresses, images, and configurable seating sections with custom rows and pricing tiers.</p>
+          <div class="feature-card__tags">
+            <span class="tag">Sections</span>
+            <span class="tag">Rows</span>
+            <span class="tag">Pricing</span>
+          </div>
+        </article>
+
+        <!-- Feature 3 -->
+        <article class="feature-card" id="feature-booking">
+          <div class="feature-card__icon-wrap feature-card__icon-wrap--purple">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M20 12V22H4V12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M22 7H2v5h20V7z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M12 22V7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <h3 class="feature-card__title">Interactive Seat Booking</h3>
+          <p class="feature-card__desc">Browse available seats visually, select your preferred spots, and book instantly with a smooth, real-time experience.</p>
+          <div class="feature-card__tags">
+            <span class="tag">Visual Map</span>
+            <span class="tag">Real-time</span>
+            <span class="tag">Instant</span>
+          </div>
+        </article>
+
+        <!-- Feature 4 -->
+        <article class="feature-card" id="feature-dashboard">
+          <div class="feature-card__icon-wrap feature-card__icon-wrap--green">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M9 11l3 3L22 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <h3 class="feature-card__title">Booking Dashboard</h3>
+          <p class="feature-card__desc">Track every booking with status indicators, seat details, payment summaries, and a clean overview of your event history.</p>
+          <div class="feature-card__tags">
+            <span class="tag">Status</span>
+            <span class="tag">History</span>
+            <span class="tag">Details</span>
+          </div>
+        </article>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════ HOW IT WORKS ═══════════════════ -->
+  <section class="how-it-works" aria-labelledby="how-heading">
+    <div class="section-container">
+      <div class="section-header">
+        <span class="section-tag">How It Works</span>
+        <h2 class="section-title" id="how-heading">Three steps to your next event</h2>
+        <p class="section-subtitle">Whether you're an organizer or an attendee, getting started is simple.</p>
+      </div>
+
+      <div class="steps">
+        <div class="step" id="step-1">
+          <div class="step__number">1</div>
+          <div class="step__content">
+            <h3 class="step__title">Create</h3>
+            <p class="step__desc">Set up your venue and publish your event with all the details your audience needs.</p>
+          </div>
+        </div>
+
+        <div class="step__connector" aria-hidden="true">
+          <svg width="40" height="24" viewBox="0 0 40 24" fill="none">
+            <path d="M0 12h32M26 6l6 6-6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+
+        <div class="step" id="step-2">
+          <div class="step__number">2</div>
+          <div class="step__content">
+            <h3 class="step__title">Book</h3>
+            <p class="step__desc">Browse events, explore seating sections, and secure your favourite seats in seconds.</p>
+          </div>
+        </div>
+
+        <div class="step__connector" aria-hidden="true">
+          <svg width="40" height="24" viewBox="0 0 40 24" fill="none">
+            <path d="M0 12h32M26 6l6 6-6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+
+        <div class="step" id="step-3">
+          <div class="step__number">3</div>
+          <div class="step__content">
+            <h3 class="step__title">Enjoy</h3>
+            <p class="step__desc">Track your bookings, get all the details, and show up ready for an amazing experience.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════ CTA ═══════════════════ -->
+  <section class="cta-section" aria-labelledby="cta-heading">
+    <div class="cta-card">
+      <div class="cta-card__orb cta-card__orb--1" aria-hidden="true"></div>
+      <div class="cta-card__orb cta-card__orb--2" aria-hidden="true"></div>
+      <h2 class="cta-card__title" id="cta-heading">Ready to master your events?</h2>
+      <p class="cta-card__subtitle">Join EventMaster and start creating unforgettable experiences today.</p>
+      <a routerLink="/register" class="btn-hero-primary btn-hero-primary--lg" id="cta-get-started">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        Create Your Free Account
+      </a>
+    </div>
+  </section>
+
+  <!-- ═══════════════════ FOOTER ═══════════════════ -->
+  <footer class="footer" role="contentinfo">
+    <div class="footer__inner">
+      <div class="footer__brand">
+        <svg width="24" height="24" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+          <rect width="32" height="32" rx="10" fill="#E94560"/>
+          <path d="M8 16L14 22L24 10" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <span>EventMaster</span>
+      </div>
+      <p class="footer__copy">&copy; 2026 EventMaster. Built with passion.</p>
+    </div>
+  </footer>
+
+</div>
