@@ -1,0 +1,407 @@
+<main class="stats-page" aria-label="Event Statistics Dashboard">
+  <!-- Background orbs -->
+  <div class="bg-orb bg-orb--1" aria-hidden="true"></div>
+  <div class="bg-orb bg-orb--2" aria-hidden="true"></div>
+  <div class="bg-orb bg-orb--3" aria-hidden="true"></div>
+
+  <!-- ═══════════════════ NAVBAR ═══════════════════ -->
+  <header class="navbar" role="banner">
+    <div class="brand">
+      <button class="back-btn" (click)="goBack()" id="stats-back" aria-label="Back to events">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M19 12H5M12 19l-7-7 7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+            stroke-linejoin="round" />
+        </svg>
+      </button>
+      <svg width="30" height="30" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+        <rect width="32" height="32" rx="10" fill="#E94560" />
+        <path d="M8 16L14 22L24 10" stroke="white" stroke-width="2.5" stroke-linecap="round"
+          stroke-linejoin="round" />
+      </svg>
+      <span class="brand__name">EventMaster</span>
+    </div>
+
+    <nav class="navbar__actions" aria-label="Stats navigation">
+      @if (event()) {
+      <button class="btn-edit" id="stats-edit-event" (click)="openEdit()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" stroke="currentColor"
+            stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+          <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+        Edit Event
+      </button>
+      }
+    </nav>
+  </header>
+
+  <!-- ═══════════════════ LOADING ═══════════════════ -->
+  @if (loading()) {
+  <div class="content-wrap">
+    <div class="loading-state">
+      <div class="loader-ring">
+        <div></div><div></div><div></div><div></div>
+      </div>
+      <p class="loading-text">Loading dashboard…</p>
+    </div>
+  </div>
+  }
+
+  <!-- ═══════════════════ ERROR ═══════════════════ -->
+  @else if (error()) {
+  <div class="content-wrap">
+    <div class="error-state" role="alert">
+      <span class="error-icon" aria-hidden="true">⚠️</span>
+      <p class="error-text">{{ error() }}</p>
+      <button class="btn-accent" (click)="loadData()" id="retry-stats">Retry</button>
+    </div>
+  </div>
+  }
+
+  <!-- ═══════════════════ DASHBOARD ═══════════════════ -->
+  @else if (dashboard() && event()) {
+  <div class="content-wrap">
+
+    <!-- ── Page Header ── -->
+    <div class="page-header">
+      <div class="page-header__info">
+        <h1 class="page-header__title" id="stats-heading">{{ event()!.name }}</h1>
+        <p class="page-header__sub">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <rect x="3" y="4" width="18" height="18" rx="2" stroke="currentColor" stroke-width="1.8" />
+            <path d="M16 2v4M8 2v4M3 10h18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+          </svg>
+          {{ formatDate(event()!.event_on) }}
+        </p>
+      </div>
+      <div class="page-header__badge">
+        <span class="live-badge">
+          <span class="live-dot" aria-hidden="true"></span>
+          Live · Day {{ dashboard()!.days_since_live }}
+        </span>
+      </div>
+    </div>
+
+    <!-- ═══════════════════ 1. TOP-LINE SUMMARY CARDS ═══════════════════ -->
+    <section class="section" aria-labelledby="summary-heading">
+      <h2 class="section__title" id="summary-heading">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M18 20V10M12 20V4M6 20v-6" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+            stroke-linejoin="round" />
+        </svg>
+        Overview
+      </h2>
+
+      <div class="summary-grid">
+        <!-- Total Seats -->
+        <div class="stat-card">
+          <div class="stat-card__icon stat-card__icon--blue">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+              <rect x="2" y="8" width="20" height="10" rx="2" stroke="currentColor" stroke-width="1.8" />
+              <path d="M6 8V6a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v2" stroke="currentColor" stroke-width="1.8" />
+            </svg>
+          </div>
+          <div class="stat-card__data">
+            <span class="stat-card__value">{{ dashboard()!.total_seats }}</span>
+            <span class="stat-card__label">Total Seats</span>
+          </div>
+        </div>
+
+        <!-- Sold -->
+        <div class="stat-card">
+          <div class="stat-card__icon stat-card__icon--green">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+              <path d="M20 6L9 17l-5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                stroke-linejoin="round" />
+            </svg>
+          </div>
+          <div class="stat-card__data">
+            <span class="stat-card__value">{{ dashboard()!.booked_seats }}</span>
+            <span class="stat-card__label">Seats Sold</span>
+          </div>
+          <span class="stat-card__badge stat-card__badge--green">{{ percentSold() }}%</span>
+        </div>
+
+        <!-- Held -->
+        <div class="stat-card">
+          <div class="stat-card__icon stat-card__icon--amber">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+              <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.8" />
+              <path d="M12 6v6l4 2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
+                stroke-linejoin="round" />
+            </svg>
+          </div>
+          <div class="stat-card__data">
+            <span class="stat-card__value">{{ dashboard()!.held_seats }}</span>
+            <span class="stat-card__label">In Checkout</span>
+          </div>
+        </div>
+
+        <!-- Available -->
+        <div class="stat-card">
+          <div class="stat-card__icon stat-card__icon--cyan">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" stroke="currentColor" stroke-width="1.8"
+                stroke-linecap="round" />
+              <path d="M22 4L12 14.01l-3-3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
+                stroke-linejoin="round" />
+            </svg>
+          </div>
+          <div class="stat-card__data">
+            <span class="stat-card__value">{{ dashboard()!.available_seats }}</span>
+            <span class="stat-card__label">Available</span>
+          </div>
+        </div>
+
+        <!-- Revenue -->
+        <div class="stat-card stat-card--wide">
+          <div class="stat-card__icon stat-card__icon--pink">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+              <path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" stroke="currentColor"
+                stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+          </div>
+          <div class="stat-card__data">
+            <span class="stat-card__value">{{ formatCurrency(dashboard()!.total_revenue) }}</span>
+            <span class="stat-card__label">Total Revenue</span>
+          </div>
+        </div>
+
+        <!-- Days -->
+        <div class="stat-card stat-card--wide">
+          <div class="stat-card__icon stat-card__icon--purple">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+              <rect x="3" y="4" width="18" height="18" rx="2" stroke="currentColor" stroke-width="1.8" />
+              <path d="M16 2v4M8 2v4M3 10h18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+            </svg>
+          </div>
+          <div class="stat-card__data">
+            <div class="days-dual">
+              <div class="days-item">
+                <span class="days-value">{{ dashboard()!.days_since_live }}</span>
+                <span class="days-label">Days Live</span>
+              </div>
+              <div class="days-divider"></div>
+              <div class="days-item">
+                <span class="days-value">{{ daysUntilEvent() }}</span>
+                <span class="days-label">Days Until</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Conversion Rate -->
+        <div class="stat-card">
+          <div class="stat-card__icon stat-card__icon--teal">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+              <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" stroke="currentColor" stroke-width="1.8"
+                stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+          </div>
+          <div class="stat-card__data">
+            <span class="stat-card__value">{{ conversionRate() }}%</span>
+            <span class="stat-card__label">Conversion Rate</span>
+          </div>
+        </div>
+
+        <!-- Avg Revenue -->
+        <div class="stat-card">
+          <div class="stat-card__icon stat-card__icon--orange">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+              <line x1="12" y1="1" x2="12" y2="23" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+              <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" stroke="currentColor" stroke-width="1.8"
+                stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+          </div>
+          <div class="stat-card__data">
+            <span class="stat-card__value">{{ formatCurrency(avgRevenuePerTicket()) }}</span>
+            <span class="stat-card__label">Avg / Ticket</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════ 2. ML PREDICTION PANEL ═══════════════════ -->
+    <section class="section" aria-labelledby="prediction-heading">
+      <h2 class="section__title" id="prediction-heading">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" stroke="currentColor" stroke-width="1.8"
+            stroke-linecap="round" stroke-linejoin="round" />
+          <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" stroke="currentColor" stroke-width="1.8"
+            stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+        ML Prediction
+      </h2>
+
+      <div class="prediction-panel">
+        <div class="prediction-grid">
+          <!-- Predicted Final -->
+          <div class="pred-card">
+            <div class="pred-card__header">
+              <span class="pred-card__icon">🤖</span>
+              <span class="pred-card__title">Predicted Final Sales</span>
+            </div>
+            <span class="pred-card__value pred-card__value--large">
+              {{ prediction() !== null ? prediction() : '—' }}
+            </span>
+            <span class="pred-card__sub">tickets by event day</span>
+          </div>
+
+          <!-- Pace Indicator -->
+          <div class="pred-card">
+            <div class="pred-card__header">
+              <span class="pred-card__icon">{{ paceStatus().icon }}</span>
+              <span class="pred-card__title">Sales Pace</span>
+            </div>
+            <span class="pace-badge {{ paceStatus().class }}">{{ paceStatus().label }}</span>
+            <span class="pred-card__sub">
+              {{ dashboard()!.booked_seats }} sold at day {{ dashboard()!.days_since_live }}
+            </span>
+          </div>
+
+          <!-- Estimated Sellout -->
+          <div class="pred-card">
+            <div class="pred-card__header">
+              <span class="pred-card__icon">📈</span>
+              <span class="pred-card__title">Est. Sellout Date</span>
+            </div>
+            <span class="pred-card__value">{{ estimatedSelloutDate() }}</span>
+            <span class="pred-card__sub">at current trajectory</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════ 3. SECTION-WISE BREAKDOWN ═══════════════════ -->
+    <section class="section" aria-labelledby="sections-heading">
+      <h2 class="section__title" id="sections-heading">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+        Section Breakdown
+      </h2>
+
+      <div class="sections-table-wrap">
+        <table class="stats-table" aria-label="Section-wise ticket breakdown">
+          <thead>
+            <tr>
+              <th>Section</th>
+              <th>Tier</th>
+              <th class="text-right">Price</th>
+              <th class="text-center">Capacity</th>
+              <th class="text-center">Sold</th>
+              <th class="text-center">Available</th>
+              <th>Fill Rate</th>
+              <th class="text-right">Revenue</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (s of sectionList(); track s.id) {
+            <tr>
+              <td>
+                <span class="section-name-cell">{{ s.name }}</span>
+              </td>
+              <td>
+                <span class="tier-badge {{ tierClass(s.tier) }}">{{ tierLabel(s.tier) }}</span>
+              </td>
+              <td class="text-right mono">{{ formatCurrency(s.price) }}</td>
+              <td class="text-center">{{ s.capacity }}</td>
+              <td class="text-center">
+                <span class="sold-cell">{{ s.sold }}</span>
+              </td>
+              <td class="text-center">{{ s.available }}</td>
+              <td>
+                <div class="fill-bar-wrap">
+                  <div class="fill-bar">
+                    <div class="fill-bar__fill" [style.width.%]="s.fillPct"
+                      [class.fill-bar__fill--high]="s.fillPct >= 80"
+                      [class.fill-bar__fill--mid]="s.fillPct >= 40 && s.fillPct < 80"
+                      [class.fill-bar__fill--low]="s.fillPct < 40">
+                    </div>
+                  </div>
+                  <span class="fill-pct">{{ s.fillPct }}%</span>
+                </div>
+              </td>
+              <td class="text-right mono">{{ formatCurrency(s.revenue) }}</td>
+            </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ═══════════════════ 4. SALES TREND CHART ═══════════════════ -->
+    <section class="section" aria-labelledby="trend-heading">
+      <h2 class="section__title" id="trend-heading">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" stroke="currentColor" stroke-width="1.8"
+            stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+        Sales Trend
+      </h2>
+
+      <div class="chart-panel">
+        <canvas #trendCanvas class="chart-canvas" aria-label="Cumulative sales vs predicted chart"></canvas>
+      </div>
+    </section>
+
+    <!-- ═══════════════════ 5. BOOKING HEALTH ═══════════════════ -->
+    <section class="section" aria-labelledby="health-heading">
+      <h2 class="section__title" id="health-heading">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M22 12h-4l-3 9L9 3l-3 9H2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
+            stroke-linejoin="round" />
+        </svg>
+        Booking Health
+      </h2>
+
+      <div class="health-panel">
+        <div class="health-chart-wrap">
+          <canvas #healthCanvas class="health-canvas" aria-label="Booking status breakdown chart"></canvas>
+        </div>
+
+        <div class="health-legend">
+          @for (item of [
+            { key: 'CONFIRMED', label: 'Confirmed', value: dashboard()!.booking_health.CONFIRMED },
+            { key: 'PENDING', label: 'Pending', value: dashboard()!.booking_health.PENDING },
+            { key: 'CANCELLED', label: 'Cancelled', value: dashboard()!.booking_health.CANCELLED },
+            { key: 'EXPIRED', label: 'Expired', value: dashboard()!.booking_health.EXPIRED }
+          ]; track item.key) {
+          <div class="health-item">
+            <span class="health-dot" [style.background]="healthColor(item.key)"></span>
+            <span class="health-label">{{ item.label }}</span>
+            <span class="health-count">{{ item.value }}</span>
+            <span class="health-pct">{{ healthPct(item.value) }}%</span>
+          </div>
+          }
+        </div>
+
+        @if (dashboard()!.booking_health.EXPIRED > 0) {
+        <div class="health-alert" role="alert">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path
+              d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"
+              stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+            <line x1="12" y1="9" x2="12" y2="13" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+            <line x1="12" y1="17" x2="12.01" y2="17" stroke="currentColor" stroke-width="1.8"
+              stroke-linecap="round" />
+          </svg>
+          <div>
+            <strong>{{ dashboard()!.booking_health.EXPIRED }} expired bookings</strong> detected — users are holding
+            seats but not completing payment. This could signal checkout friction or price sensitivity.
+          </div>
+        </div>
+        }
+      </div>
+    </section>
+
+  </div>
+  }
+
+  <!-- ═══════════════════ EDIT MODAL ═══════════════════ -->
+  @if (showEditForm()) {
+  <app-event-form [event]="event()" (saved)="onEditSaved()" (closed)="closeEdit()" />
+  }
+</main>

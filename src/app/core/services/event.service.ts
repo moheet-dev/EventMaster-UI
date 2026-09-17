@@ -60,6 +60,49 @@ interface EventMutateResponse {
   status: number;
 }
 
+/* ── Dashboard API types ── */
+export interface SectionStat {
+  name: string;
+  tier: number;
+  price: string;
+  capacity: number;
+  sold: number;
+  available: number;
+  revenue: string;
+}
+
+export interface BookingHealth {
+  total: number;
+  PENDING: number;
+  CONFIRMED: number;
+  CANCELLED: number;
+  EXPIRED: number;
+}
+
+export interface DashboardData {
+  total_seats: number;
+  booked_seats: number;
+  held_seats: number;
+  available_seats: number;
+  total_revenue: number;
+  days_since_live: number;
+  days_booked_since_live: Record<string, number>;
+  booking_health: BookingHealth;
+  section_wise: Record<string, SectionStat>;
+}
+
+export interface DashboardResponse {
+  data: DashboardData;
+  message: string;
+  status: number;
+}
+
+export interface PredictionResponse {
+  data: { prediction: number };
+  message: string;
+  status: number;
+}
+
 @Injectable({ providedIn: 'root' })
 export class EventService {
   private readonly base = environment.apiBaseUrl;
@@ -94,5 +137,18 @@ export class EventService {
       `${this.base}/events/update/${id}`,
       data,
     );
+  }
+
+  /** Fetch event dashboard analytics */
+  getDashboard(eventId: number): Observable<DashboardResponse> {
+    return this.http.get<DashboardResponse>(`${this.base}/events/${eventId}/dashboard`);
+  }
+
+  /** Get ML ticket-sale prediction */
+  predictTicketSale(days_since_live: number, capacity: number): Observable<PredictionResponse> {
+    return this.http.post<PredictionResponse>(`${this.base}/predictions/ticket_sale`, {
+      days_since_live,
+      capacity,
+    });
   }
 }

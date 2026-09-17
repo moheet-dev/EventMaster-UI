@@ -120,7 +120,6 @@
                         <button
                           class="seat-cell"
                           [class.seat-cell--selected]="isSeatSelected(activeSection()!.id, seat.code)"
-                          [class.seat-cell--booked]="getSeatStatus(seat) === 'SOLD'"
                           [class.seat-cell--held]="getSeatStatus(seat) === 'HELD'"
                           [style.--section-color]="sectionColor(activeSection()!.tier)"
                           [disabled]="getSeatStatus(seat) !== 'AVAILABLE'"

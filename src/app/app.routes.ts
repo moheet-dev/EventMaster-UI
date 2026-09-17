@@ -41,6 +41,14 @@ export const routes: Routes = [
     canActivate: [authGuard],
   },
   {
+    path: 'event/:eventId/stats',
+    loadComponent: () =>
+      import('./features/events/event-stats/event-stats.component').then(
+        (m) => m.EventStatsComponent
+      ),
+    canActivate: [authGuard],
+  },
+  {
     path: '**',
     redirectTo: '',
   },

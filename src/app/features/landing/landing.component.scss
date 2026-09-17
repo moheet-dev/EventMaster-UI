@@ -780,6 +780,22 @@
     padding: 0.75rem 1rem;
   }
 
+  .navbar__actions {
+    gap: 0.5rem;
+  }
+
+  .nav-link {
+    padding: 0.4rem 0.65rem;
+    font-size: 0.82rem;
+    white-space: nowrap;
+  }
+
+  .nav-cta {
+    padding: 0.45rem 0.85rem;
+    font-size: 0.82rem;
+    white-space: nowrap;
+  }
+
   .hero__title {
     font-size: 2.4rem;
   }
@@ -787,12 +803,15 @@
   .hero__actions {
     flex-direction: column;
     width: 100%;
+    align-items: stretch;
   }
 
   .btn-hero-primary,
   .btn-hero-secondary {
-    width: 100%;
     justify-content: center;
+    padding: 0.75rem 1.25rem;
+    font-size: 0.95rem;
+    white-space: nowrap;
   }
 
   .hero__stats {
@@ -812,6 +831,16 @@
 
   .cta-card {
     padding: 3rem 1.25rem;
+  }
+
+  /* CTA bottom button — prevent it from stretching thick */
+  .btn-hero-primary--lg {
+    display: inline-flex;
+    width: auto;
+    max-width: 100%;
+    font-size: 0.95rem;
+    padding: 0.85rem 1.75rem;
+    white-space: nowrap;
   }
 
   .footer__inner {

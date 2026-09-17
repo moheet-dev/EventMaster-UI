@@ -201,9 +201,8 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.showEventForm.set(true);
   }
 
-  openEditEvent(event: AppEvent): void {
-    this.editingEvent.set(event);
-    this.showEventForm.set(true);
+  openEventStats(eventId: number): void {
+    this.router.navigate(['/event', eventId, 'stats']);
   }
 
   openBooking(eventId: number): void {
