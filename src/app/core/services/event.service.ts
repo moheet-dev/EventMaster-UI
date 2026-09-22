@@ -12,6 +12,7 @@ export interface Event {
   event_on: string;
   created_at: string;
   created_by: number | null;
+  rank?: number;
 }
 
 export interface EventReq {
